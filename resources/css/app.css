@@ -1,0 +1,157 @@
+@import 'tailwindcss';
+
+/* Selalu pakai tema terang — varian dark: hanya aktif bila <html class="dark">.
+   (Default Tailwind v4 = ikut prefers-color-scheme OS → halaman bisa gelap.) */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+
+@theme inline {
+    --font-sans:
+        Instrument Sans, ui-sans-serif, system-ui, sans-serif,
+        'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
+        'Noto Color Emoji';
+
+    /* ===== Token shadcn/ui (tema terang) ===== */
+    --color-background: #ffffff;
+    --color-foreground: #0f172a;
+    --color-card: #ffffff;
+    --color-card-foreground: #0f172a;
+    --color-popover: #ffffff;
+    --color-popover-foreground: #0f172a;
+    --color-primary: #2563eb;
+    --color-primary-foreground: #ffffff;
+    --color-secondary: #f8fafc;
+    --color-secondary-foreground: #0f172a;
+    --color-muted: #f1f5f9;
+    --color-muted-foreground: #64748b;
+    --color-accent: #eff6ff;
+    --color-accent-foreground: #1d4ed8;
+    --color-destructive: #ef4444;
+    --color-destructive-foreground: #ffffff;
+    --color-border: #e2e8f0;
+    --color-input: #e2e8f0;
+    --color-ring: #2563eb;
+
+    --color-sidebar-background: #ffffff;
+    --color-sidebar-foreground: #374151;
+    --color-sidebar-primary: #2563eb;
+    --color-sidebar-primary-foreground: #ffffff;
+    --color-sidebar-accent: #eff6ff;
+    --color-sidebar-accent-foreground: #1d4ed8;
+    --color-sidebar-border: #e5e7eb;
+    --color-sidebar-ring: #2563eb;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+/* ===== Animasi keluar/masuk komponen (v-reveal) ===== */
+.reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition:
+        opacity 0.6s ease,
+        transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.reveal.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* ===== Transisi menu mobile navbar ===== */
+.menu-enter-active,
+.menu-leave-active {
+    transition:
+        opacity 0.25s ease,
+        transform 0.25s ease;
+}
+
+.menu-enter-from,
+.menu-leave-to {
+    opacity: 0;
+    transform: translateY(-10px);
+}
+
+/* ===== Marquee testimoni (dua baris berjalan berlawanan arah) ===== */
+@keyframes marquee-to-left {
+    from {
+        transform: translateX(0);
+    }
+
+    to {
+        transform: translateX(-50%);
+    }
+}
+
+@keyframes marquee-to-right {
+    from {
+        transform: translateX(-50%);
+    }
+
+    to {
+        transform: translateX(0);
+    }
+}
+
+.marquee-track {
+    display: flex;
+    width: max-content;
+    animation: marquee-to-left 55s linear infinite;
+    will-change: transform;
+}
+
+.marquee-track.to-right {
+    animation-name: marquee-to-right;
+}
+
+.marquee:hover .marquee-track {
+    animation-play-state: paused;
+}
+
+/* ===== FAQ terbuka ===== */
+details[open] > p {
+    animation: faq-in 0.3s ease both;
+}
+
+@keyframes faq-in {
+    from {
+        opacity: 0;
+        transform: translateY(-6px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
+
+    .reveal {
+        opacity: 1;
+        transform: none;
+        transition: none;
+    }
+
+    .menu-enter-active,
+    .menu-leave-active,
+    details[open] > p {
+        transition: none;
+        animation: none;
+    }
+
+    .marquee-track {
+        animation: none;
+    }
+
+    .marquee {
+        overflow-x: auto;
+    }
+}
