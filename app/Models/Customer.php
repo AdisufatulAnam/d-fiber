@@ -2,6 +2,10 @@
 
 namespace App\Models;
 
+use BaconQrCode\Renderer\Image\SvgImageBackEnd;
+use BaconQrCode\Renderer\ImageRenderer;
+use BaconQrCode\Renderer\RendererStyle\RendererStyle;
+use BaconQrCode\Writer;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -48,9 +52,22 @@ class Customer extends Model
     public static function generateQrCode(): string
     {
         do {
-            $code = 'DFB-' . strtoupper(bin2hex(random_bytes(4)));
+            $code = 'DFB-'.strtoupper(bin2hex(random_bytes(4)));
         } while (self::where('qr_code', $code)->exists());
 
         return $code;
+    }
+
+    /**
+     * Render kode QR pelanggan sebagai string SVG (untuk PDF/print).
+     */
+    public function qrSvg(int $size = 256, int $margin = 2): string
+    {
+        $renderer = new ImageRenderer(
+            new RendererStyle($size, $margin),
+            new SvgImageBackEnd
+        );
+
+        return (new Writer($renderer))->writeString((string) $this->qr_code);
     }
 }

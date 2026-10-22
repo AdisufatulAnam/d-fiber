@@ -1,4 +1,4 @@
-FROM php:8.4-fpm
+FROM php:8.5.12-fpm
 
 # Install system dependencies, PHP extensions, and Node.js
 RUN apt-get update && apt-get install -y \
@@ -17,7 +17,7 @@ RUN apt-get update && apt-get install -y \
 
 # Clear cache
 RUN docker-php-ext-configure intl \
-    && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd intl opcache
+    && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd intl
 
 # Get latest Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
@@ -32,7 +32,7 @@ COPY . .
 RUN cp .env.example .env \
     && mkdir -p database storage/framework/sessions storage/framework/views storage/framework/cache \
     && touch database/database.sqlite \
-    && composer install --no-dev --optimize-autoloader --no-interaction \
+    && composer install --optimize-autoloader --no-interaction \
     && php artisan key:generate \
     && npm install \
     && npm run build

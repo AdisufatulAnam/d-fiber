@@ -106,7 +106,7 @@ class SendPaymentInvoice implements ShouldQueue
         ]);
 
         // Melempar exception agar queue mencoba lagi (retry dengan backoff).
-        throw new \RuntimeException('Gagal kirim WhatsApp invoice: ' . ($result['error'] ?? 'unknown'));
+        throw new \RuntimeException('Gagal kirim WhatsApp invoice: '.($result['error'] ?? 'unknown'));
     }
 
     public function failed(?Throwable $exception): void
@@ -138,10 +138,10 @@ class SendPaymentInvoice implements ShouldQueue
 
     private function buildMessage(?object $customer, string $phone): string
     {
-        $brand = config('wa.brand', 'wiji.net');
+        $brand = rtrim((string) config('app.url', ''), '/') ?: config('wa.brand', 'wiji.net');
         $periode = $this->payment->billingMonthLabel();
         $nama = $customer->name ?? $this->payment->customer_name;
-        $id = $customer->id ?? '-';
+        $id = $customer->qr_code ?: ($customer->id ?? '-');
         $total = $this->payment->amountLabel();
 
         $greeting = $this->greeting();
@@ -185,9 +185,9 @@ MSG;
     {
         $nama = preg_replace('/[^A-Za-z0-9]+/', '_', (string) ($this->payment->customer->name ?? $this->payment->customer_name));
         $nama = trim($nama, '_') ?: 'Pelanggan';
-        $inv = $this->payment->invoice_number ?? ('INV' . $this->payment->id);
+        $inv = $this->payment->invoice_number ?? ('INV'.$this->payment->id);
 
-        return $nama . '_' . $inv . '.pdf';
+        return $nama.'_'.$inv.'.pdf';
     }
 
     private function generatePdf(?object $customer, string $phone): string
@@ -205,7 +205,7 @@ MSG;
         Storage::disk('local')->makeDirectory($dir);
 
         // Nama file tampil sebagai NamaPelanggan_NoInvoice.pdf
-        $relative = $dir . '/' . $this->invoiceFilename();
+        $relative = $dir.'/'.$this->invoiceFilename();
 
         // Tulis konten PDF (bukan lewat putFileAs yang salah interpret string biner).
         Storage::disk('local')->put($relative, $pdf->output());

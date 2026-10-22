@@ -16,9 +16,35 @@ services:
     environment:
       - APP_ENV=local
       - APP_DEBUG=true
-      # Koneksi database eksternal (dari .env); host diganti agar bisa diakses dari dalam container
+      # Koneksi database (dari .env). Default host.docker.internal bila DB_HOST tidak di-set.
       - DB_CONNECTION=${DB_CONNECTION:-mysql}
-      - DB_HOST=host.docker.internal
+      - DB_HOST=${DB_HOST:-host.docker.internal}
+      - DB_PORT=${DB_PORT:-3306}
+      - DB_DATABASE=${DB_DATABASE:-dfiber}
+      - DB_USERNAME=${DB_USERNAME:-root}
+      - DB_PASSWORD=${DB_PASSWORD:-}
+      - PAIL_DISABLED=true
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - dfiber-network
+
+  queue:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ${DOCKER_QUEUE_CONTAINER:-dfiber-queue}
+    restart: unless-stopped
+    command: php artisan queue:work --sleep=3 --tries=5 --timeout=120
+    volumes:
+      - .:/var/www/html
+      - ./.env:/var/www/html/.env
+      - /var/www/html/vendor
+    environment:
+      - APP_ENV=local
+      - APP_DEBUG=true
+      - DB_CONNECTION=${DB_CONNECTION:-mysql}
+      - DB_HOST=${DB_HOST:-host.docker.internal}
       - DB_PORT=${DB_PORT:-3306}
       - DB_DATABASE=${DB_DATABASE:-dfiber}
       - DB_USERNAME=${DB_USERNAME:-root}
