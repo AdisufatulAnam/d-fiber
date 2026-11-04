@@ -44,20 +44,24 @@ RUN composer install \
     --no-interaction \
     --prefer-dist
 
+# Prepare Laravel directories
+RUN mkdir -p \
+    storage/framework/sessions \
+    storage/framework/views \
+    storage/framework/cache/data \
+    storage/framework/testing \
+    storage/logs \
+    bootstrap/cache
+
+# Remove stale package discovery caches (may list dev-only providers)
+RUN rm -f bootstrap/cache/*.php
+
 # Install frontend dependencies and build assets
 RUN npm ci \
     && npm run build
 
 # Remove Vite development marker
 RUN rm -f public/hot
-
-# Prepare Laravel directories
-RUN mkdir -p \
-    storage/framework/sessions \
-    storage/framework/views \
-    storage/framework/cache \
-    storage/logs \
-    bootstrap/cache
 
 # Configure Nginx
 COPY docker/nginx.conf /etc/nginx/sites-available/default
