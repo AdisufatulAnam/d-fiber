@@ -1,6 +1,7 @@
+
 FROM php:8.5.12-fpm
 
-# Install system dependencies, PHP extensions, and Node.js
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
     git \
     curl \
@@ -13,29 +14,50 @@ RUN apt-get update && apt-get install -y \
     nginx \
     supervisor \
     && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
-    && apt-get install -y nodejs
+    && apt-get install -y nodejs \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
-# Clear cache
+# Install PHP extensions
 RUN docker-php-ext-configure intl \
-    && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd intl
+    && docker-php-ext-install \
+    pdo_mysql \
+    mbstring \
+    exif \
+    pcntl \
+    bcmath \
+    gd \
+    intl
 
-# Get latest Composer
+# Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Set working directory
 WORKDIR /var/www/html
 
-# Copy all project files
+# Copy application source
 COPY . .
 
-# Setup environment & dependencies, generate key, create sqlite db, and build frontend
-RUN cp .env.example .env \
-    && mkdir -p database storage/framework/sessions storage/framework/views storage/framework/cache \
-    && touch database/database.sqlite \
-    && composer install --optimize-autoloader --no-interaction \
-    && php artisan key:generate \
-    && npm install \
+# Install production dependencies
+RUN composer install \
+    --no-dev \
+    --optimize-autoloader \
+    --no-interaction \
+    --prefer-dist
+
+# Install frontend dependencies and build assets
+RUN npm ci \
     && npm run build
+
+# Remove Vite development marker
+RUN rm -f public/hot
+
+# Prepare Laravel directories
+RUN mkdir -p \
+    storage/framework/sessions \
+    storage/framework/views \
+    storage/framework/cache \
+    storage/logs \
+    bootstrap/cache
 
 # Configure Nginx
 COPY docker/nginx.conf /etc/nginx/sites-available/default
@@ -43,8 +65,10 @@ COPY docker/nginx.conf /etc/nginx/sites-available/default
 # Configure Supervisor
 COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
-# Set permissions
-RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/database
+# Permissions
+RUN chown -R www-data:www-data \
+    storage \
+    bootstrap/cache
 
 EXPOSE 80
 
