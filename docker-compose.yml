@@ -7,9 +7,10 @@ services:
     restart: unless-stopped
     ports:
       - "${DOCKER_HTTP_PORT:-8000}:80"
+    env_file:
+      - .env
     volumes:
       - .:/var/www/html
-      - ./.env:/var/www/html/.env
       - /var/www/html/node_modules
       - /var/www/html/vendor
     environment:
@@ -33,9 +34,10 @@ services:
     container_name: ${DOCKER_QUEUE_CONTAINER:-dfiber-queue}
     restart: unless-stopped
     command: php artisan queue:work --sleep=3 --tries=5 --timeout=120
+    env_file:
+      - .env
     volumes:
       - .:/var/www/html
-      - ./.env:/var/www/html/.env
       - /var/www/html/vendor
     environment:
       - DB_CONNECTION=${DB_CONNECTION:-mysql}
