@@ -4,9 +4,19 @@ import tailwindcss from '@tailwindcss/vite';
 import vue from '@vitejs/plugin-vue';
 import laravel from 'laravel-vite-plugin';
 import { bunny } from 'laravel-vite-plugin/fonts';
+import { loadEnv } from 'vite';
 import { defineConfig, lazyPlugins } from 'vite-plus';
 
-export default defineConfig({
+function resolveHmrHost(mode: string): string {
+    try {
+        const appUrl = loadEnv(mode, process.cwd(), 'APP_URL').APP_URL;
+        return appUrl ? new URL(appUrl).hostname : 'localhost';
+    } catch {
+        return 'localhost';
+    }
+}
+
+export default defineConfig((env) => ({
     plugins: lazyPlugins(() => [
         laravel({
             input: ['resources/css/app.css', 'resources/js/app.ts'],
@@ -36,7 +46,7 @@ export default defineConfig({
         port: 5174,
         strictPort: true,
         hmr: {
-            host: 'localhost',
+            host: resolveHmrHost(env.mode),
         },
         watch: {
             usePolling: true,
@@ -84,4 +94,4 @@ export default defineConfig({
             stylesheet: 'resources/css/app.css',
         },
     },
-});
+}));
