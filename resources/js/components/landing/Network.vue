@@ -18,7 +18,7 @@ const services = [
                 <h2
                     class="mt-3 text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl dark:text-white"
                 >
-                    Jaringan DFiber Dipantau Secara Berkala
+                    Jaringan Wijinet Dipantau Secara Berkala
                 </h2>
                 <p class="mt-4 text-base text-slate-600 dark:text-slate-400">
                     Kami menggunakan sistem monitoring jaringan untuk membantu

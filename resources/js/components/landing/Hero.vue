@@ -2,7 +2,7 @@
 import { waLink } from './wa';
 
 const contactHref = waLink(
-    'Halo DFiber, saya ingin menanyakan layanan internet.',
+    'Halo Wijinet, saya ingin menanyakan layanan internet.',
 );
 
 const chips = [

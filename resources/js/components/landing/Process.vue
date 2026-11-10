@@ -10,7 +10,7 @@ const steps = [
     {
         no: '02',
         title: 'Cek Coverage',
-        desc: 'Tim kami memastikan jaringan DFiber tersedia di lokasi Anda.',
+        desc: 'Tim kami memastikan jaringan Wijinet tersedia di lokasi Anda.',
     },
     {
         no: '03',
@@ -24,7 +24,7 @@ const steps = [
     },
 ];
 
-const registerHref = waLink('Halo DFiber, saya ingin mendaftar.');
+const registerHref = waLink('Halo Wijinet, saya ingin mendaftar.');
 </script>
 
 <template>
@@ -39,7 +39,7 @@ const registerHref = waLink('Halo DFiber, saya ingin mendaftar.');
                 <h2
                     class="mt-3 text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl dark:text-white"
                 >
-                    Berlangganan DFiber Itu Mudah
+                    Berlangganan Wijinet Itu Mudah
                 </h2>
             </div>
 

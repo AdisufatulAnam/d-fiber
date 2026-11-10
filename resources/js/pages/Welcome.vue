@@ -18,12 +18,12 @@ import Footer from '../components/landing/Footer.vue';
 import { waLink } from '../components/landing/wa';
 
 const floatingChatHref = waLink(
-    'Halo DFiber, saya ingin menanyakan layanan internet',
+    'Halo Wijinet, saya ingin menanyakan layanan internet',
 );
 </script>
 
 <template>
-    <Head title="DFiber - Internet Cepat, Stabil, Tanpa Ribet" />
+    <Head title="Wijinet - Internet Cepat, Stabil, Tanpa Ribet" />
 
     <div
         class="min-h-screen bg-white text-slate-900 selection:bg-blue-600 selection:text-white dark:bg-slate-950 dark:text-slate-100"
@@ -52,7 +52,7 @@ const floatingChatHref = waLink(
             :href="floatingChatHref"
             target="_blank"
             rel="noopener"
-            aria-label="Chat WhatsApp DFiber"
+            aria-label="Chat WhatsApp Wijinet"
             class="fixed right-5 bottom-5 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-emerald-500 text-white shadow-xl shadow-emerald-600/30 transition-transform hover:scale-110"
         >
             <svg class="h-7 w-7" viewBox="0 0 24 24" fill="currentColor">

@@ -13,7 +13,7 @@ const links = [
     { label: 'Kontak', href: '#kontak' },
 ];
 
-const subscribeHref = waLink('Halo DFiber, saya ingin berlangganan.');
+const subscribeHref = waLink('Halo Wijinet, saya ingin berlangganan.');
 </script>
 
 <template>
@@ -52,7 +52,7 @@ const subscribeHref = waLink('Halo DFiber, saya ingin berlangganan.');
                     <span
                         class="block text-lg font-bold tracking-tight text-slate-900 dark:text-white"
                     >
-                        DFiber
+                        Wijinet
                     </span>
                     <span
                         class="block text-[11px] font-medium tracking-wide text-slate-500 dark:text-slate-400"

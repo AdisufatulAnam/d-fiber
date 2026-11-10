@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { waLink } from './wa';
 
-const subscribeHref = waLink('Halo DFiber, saya ingin berlangganan');
+const subscribeHref = waLink('Halo Wijinet, saya ingin berlangganan');
 </script>
 
 <template>
@@ -32,7 +32,7 @@ const subscribeHref = waLink('Halo DFiber, saya ingin berlangganan');
                     <p
                         class="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-white/85 sm:text-lg"
                     >
-                        Dapatkan koneksi cepat dan stabil bersama DFiber.
+                        Dapatkan koneksi cepat dan stabil bersama Wijinet.
                     </p>
 
                     <div

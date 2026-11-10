@@ -63,7 +63,7 @@ function submit() {
                             type="email"
                             name="email"
                             autocomplete="username"
-                            placeholder="admin@dfiber.id"
+                            placeholder="admin@wijinet.my.id"
                             required
                             :class="form.errors.email && 'border-destructive'"
                         />

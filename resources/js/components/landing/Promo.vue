@@ -8,7 +8,7 @@ const benefits = [
     'Paket unlimited',
 ];
 
-const claimHref = waLink('Halo DFiber, saya ingin klaim promo pasang baru');
+const claimHref = waLink('Halo Wijinet, saya ingin klaim promo pasang baru');
 </script>
 
 <template>
@@ -39,7 +39,7 @@ const claimHref = waLink('Halo DFiber, saya ingin klaim promo pasang baru');
                         <h2
                             class="mt-4 text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl"
                         >
-                            Pasang Baru DFiber
+                            Pasang Baru Wijinet
                         </h2>
                         <p
                             class="mt-3 text-sm leading-relaxed text-slate-600 sm:text-base"

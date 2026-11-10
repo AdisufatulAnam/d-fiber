@@ -34,7 +34,7 @@
             </span>
             <div>
                 <p class="text-lg font-extrabold tracking-tight text-slate-900">
-                    DFiber
+                    Wijinet
                 </p>
                 <p class="text-xs font-medium text-slate-500">
                     Panel Admin Operasional
@@ -45,7 +45,7 @@
         <div class="w-full max-w-md"><slot /></div>
 
         <p class="mt-8 text-center text-xs text-slate-400">
-            © 2026 DFiber &bull; Piyungan, Bantul, D.I. Yogyakarta
+            © 2026 Wijinet &bull; Piyungan, Bantul, D.I. Yogyakarta
         </p>
     </div>
 </template>

@@ -3,7 +3,7 @@ import { waLink } from './wa';
 
 const plans = [
     {
-        name: 'DFiber Basic',
+        name: 'Wijinet Basic',
         price: '100.000',
         speed: 'Hingga 10 Mbps',
         featured: false,
@@ -16,7 +16,7 @@ const plans = [
         ],
     },
     {
-        name: 'DFiber Family',
+        name: 'Wijinet Family',
         price: '150.000',
         speed: 'Hingga 20 Mbps',
         featured: true,
@@ -30,7 +30,7 @@ const plans = [
         ],
     },
     {
-        name: 'DFiber Pro',
+        name: 'Wijinet Pro',
         price: '200.000',
         speed: 'Hingga 30 Mbps',
         featured: false,
@@ -45,7 +45,7 @@ const plans = [
         ],
     },
     {
-        name: 'DFiber Business',
+        name: 'Wijinet Business',
         price: '300.000',
         speed: 'Hingga 50 Mbps',
         featured: false,
@@ -155,7 +155,7 @@ const plans = [
                     <a
                         :href="
                             waLink(
-                                `Halo DFiber, saya ingin berlangganan paket ${plan.name}`,
+                                `Halo Wijinet, saya ingin berlangganan paket ${plan.name}`,
                             )
                         "
                         target="_blank"

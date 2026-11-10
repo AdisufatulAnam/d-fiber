@@ -187,7 +187,7 @@ const printReceipt = (bill: Bill) => {
   .row span:last-child { text-align:right; }
   .big { font-size:12px; font-weight:bold; }
 </style></head><body>
-  <div class="c b" style="font-size:13px">DFIBER</div>
+  <div class="c b" style="font-size:13px">WIJINET</div>
   <div class="c">Internet Service</div>
   <div class="hr"></div>
   <div class="row"><span>Invoice</span><span class="b">${inv}</span></div>

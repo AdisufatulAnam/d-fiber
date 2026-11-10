@@ -1,8 +1,8 @@
 <script setup lang="ts">
 const faqs = [
     {
-        q: 'Apakah DFiber unlimited?',
-        a: 'Ya, paket DFiber dapat menggunakan internet tanpa batas kuota sesuai ketentuan layanan.',
+        q: 'Apakah Wijinet unlimited?',
+        a: 'Ya, paket Wijinet dapat menggunakan internet tanpa batas kuota sesuai ketentuan layanan.',
     },
     {
         q: 'Berapa lama proses pemasangan?',
@@ -10,7 +10,7 @@ const faqs = [
     },
     {
         q: 'Apakah tersedia untuk bisnis?',
-        a: 'Ya. DFiber menyediakan paket untuk kebutuhan rumah maupun bisnis.',
+        a: 'Ya. Wijinet menyediakan paket untuk kebutuhan rumah maupun bisnis.',
     },
     {
         q: 'Apakah bisa upgrade paket?',
@@ -18,7 +18,7 @@ const faqs = [
     },
     {
         q: 'Bagaimana jika internet mengalami gangguan?',
-        a: 'Hubungi customer service DFiber melalui WhatsApp. Tim kami akan membantu melakukan pengecekan.',
+        a: 'Hubungi customer service Wijinet melalui WhatsApp. Tim kami akan membantu melakukan pengecekan.',
     },
     {
         q: 'Apakah tersedia WiFi router?',

@@ -17,12 +17,12 @@ const serviceLinks = [
     { label: 'Upgrade Paket', href: '#paket' },
     {
         label: 'Customer Support',
-        href: waLink('Halo DFiber, saya ingin menanyakan layanan internet'),
+        href: waLink('Halo Wijinet, saya ingin menanyakan layanan internet'),
     },
 ];
 
 const supportHref = waLink(
-    'Halo DFiber, saya ingin menanyakan layanan internet',
+    'Halo Wijinet, saya ingin menanyakan layanan internet',
 );
 </script>
 
@@ -59,7 +59,7 @@ const supportHref = waLink(
                                 />
                             </svg>
                         </span>
-                        <span class="text-lg font-bold text-white">DFiber</span>
+                        <span class="text-lg font-bold text-white">Wijinet</span>
                     </div>
                     <p class="mt-4 text-sm leading-relaxed text-slate-400">
                         Internet Cepat. Stabil. Terjangkau. Layanan internet
@@ -84,7 +84,7 @@ const supportHref = waLink(
                             </svg>
                         </a>
                         <a
-                            href="mailto:halo@dfiber.id"
+                            href="mailto:halo@wijinet.my.id"
                             aria-label="Email"
                             class="flex h-9 w-9 items-center justify-center rounded-lg border border-slate-700 text-slate-400 transition-colors hover:border-blue-500 hover:text-blue-400"
                         >
@@ -205,10 +205,10 @@ const supportHref = waLink(
                                 <path d="m3.5 7 8.5 6 8.5-6" />
                             </svg>
                             <a
-                                href="mailto:halo@dfiber.id"
+                                href="mailto:halo@wijinet.my.id"
                                 class="transition-colors hover:text-blue-400"
                             >
-                                halo@dfiber.id
+                                halo@wijinet.my.id
                             </a>
                         </li>
                         <li class="flex items-start gap-2.5">
@@ -237,7 +237,7 @@ const supportHref = waLink(
             <div
                 class="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-4 py-6 text-xs text-slate-500 sm:flex-row sm:px-6 lg:px-8"
             >
-                <p>&copy; {{ year }} DFiber. All Rights Reserved.</p>
+                <p>&copy; {{ year }} Wijinet. All Rights Reserved.</p>
                 <div class="flex gap-5">
                     <a href="#" class="transition-colors hover:text-blue-400"
                         >Terms &amp; Conditions</a

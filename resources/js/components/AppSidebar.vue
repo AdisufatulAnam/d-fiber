@@ -9,7 +9,7 @@
                     <span class="text-xs font-bold">D</span>
                 </div>
                 <span class="text-sm font-bold text-sidebar-foreground"
-                    >DFiber</span
+                    >Wijinet</span
                 >
             </div>
         </SidebarHeader>
@@ -137,7 +137,7 @@
                         Keluar dari akun?
                     </h3>
                     <p class="text-sm text-gray-500">
-                        Anda akan keluar dari panel admin DFiber.
+                        Anda akan keluar dari panel admin Wijinet.
                     </p>
                     <div class="flex justify-end gap-2">
                         <button

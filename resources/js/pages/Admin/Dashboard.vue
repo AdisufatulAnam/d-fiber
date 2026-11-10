@@ -69,7 +69,7 @@ const toneClasses: Record<Stat['tone'], string> = {
                             Selamat datang, {{ admin.name }} 👋
                         </h1>
                         <p class="mt-1 text-muted-foreground">
-                            Ringkasan operasional DFiber hari ini — Piyungan,
+                            Ringkasan operasional Wijinet hari ini — Piyungan,
                             Bantul, D.I. Yogyakarta.
                         </p>
                     </div>

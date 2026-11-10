@@ -50,7 +50,7 @@ function logout() {
                         <p
                             class="text-sm leading-tight font-bold text-foreground"
                         >
-                            DFiber
+                            Wijinet
                         </p>
                         <p
                             class="text-[11px] leading-tight text-muted-foreground"

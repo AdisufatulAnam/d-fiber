@@ -54,7 +54,7 @@ const features = [
                     Lebih dari Sekadar Internet
                 </h2>
                 <p class="mt-4 text-base text-slate-600 dark:text-slate-400">
-                    DFiber hadir dengan koneksi dan layanan yang dirancang untuk
+                    Wijinet hadir dengan koneksi dan layanan yang dirancang untuk
                     kebutuhan Anda.
                 </p>
             </div>

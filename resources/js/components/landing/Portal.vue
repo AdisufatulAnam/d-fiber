@@ -33,7 +33,7 @@ const benefits = [
                                 <p
                                     class="text-sm font-semibold text-slate-900 dark:text-white"
                                 >
-                                    DFiber Customer
+                                    Wijinet Customer
                                 </p>
                                 <p
                                     class="flex items-center gap-1.5 text-xs text-emerald-600 dark:text-emerald-400"
@@ -109,7 +109,7 @@ const benefits = [
                     Semua Kebutuhan Internet dalam Satu Layanan
                 </h2>
                 <p class="mt-4 text-base text-slate-600 dark:text-slate-400">
-                    Kelola layanan DFiber dengan lebih mudah melalui sistem
+                    Kelola layanan Wijinet dengan lebih mudah melalui sistem
                     pelanggan.
                 </p>
 

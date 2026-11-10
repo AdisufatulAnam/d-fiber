@@ -30,8 +30,8 @@ function buildMessage(
     coords?: { lat: number; lng: number },
 ): string {
     const base = location
-        ? `Halo DFiber, saya ingin cek coverage di lokasi: ${location} (${COVERAGE_AREA}).`
-        : `Halo DFiber, saya ingin menanyakan coverage area di ${COVERAGE_AREA}.`;
+        ? `Halo Wijinet, saya ingin cek coverage di lokasi: ${location} (${COVERAGE_AREA}).`
+        : `Halo Wijinet, saya ingin menanyakan coverage area di ${COVERAGE_AREA}.`;
 
     if (!coords) {
         return base;
@@ -99,7 +99,7 @@ function checkCoverage() {
                     <h2
                         class="mt-3 text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl dark:text-white"
                     >
-                        Apakah DFiber Sudah Tersedia di Area Anda?
+                        Apakah Wijinet Sudah Tersedia di Area Anda?
                     </h2>
                     <p
                         class="mt-4 text-base text-slate-600 dark:text-slate-400"

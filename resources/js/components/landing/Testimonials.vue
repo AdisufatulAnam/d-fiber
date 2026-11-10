@@ -13,7 +13,7 @@ const topRow: Testimonial[] = [
         role: 'Pelanggan • Kelurahan Sukamaju',
         initial: 'A',
         color: 'from-blue-600 to-blue-400',
-        text: 'Sejak pasang DFiber, internet rumah jadi stabil seharian. Nonton YouTube 4K nggak buffering lagi.',
+        text: 'Sejak pasang Wijinet, internet rumah jadi stabil seharian. Nonton YouTube 4K nggak buffering lagi.',
     },
     {
         name: 'Rina Wulandari',
@@ -55,7 +55,7 @@ const topRow: Testimonial[] = [
         role: 'Pelanggan • Pemilik Warung',
         initial: 'A',
         color: 'from-amber-500 to-amber-400',
-        text: 'Warung saya pakai WiFi DFiber untuk pembayaran digital, selalu online dan lancar.',
+        text: 'Warung saya pakai WiFi Wijinet untuk pembayaran digital, selalu online dan lancar.',
     },
     {
         name: 'Fajar Nugroho',
@@ -114,7 +114,7 @@ const bottomRow: Testimonial[] = [
         role: 'Pelanggan • Desa Sukarasa',
         initial: 'N',
         color: 'from-purple-600 to-purple-400',
-        text: 'Di desa kami akhirnya ada internet cepat. DFiber beneran ngebantu banget.',
+        text: 'Di desa kami akhirnya ada internet cepat. Wijinet beneran ngebantu banget.',
     },
     {
         name: 'Tony Saputra',
@@ -147,7 +147,7 @@ const rows = [
                 </h2>
                 <p class="mt-4 text-base text-slate-600">
                     Ratusan pelanggan RT/RW Net sudah membuktikan koneksi
-                    DFiber.
+                    Wijinet.
                 </p>
             </div>
         </div>
