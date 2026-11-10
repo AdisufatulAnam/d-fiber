@@ -30,7 +30,6 @@ const floatingChatHref = waLink(
     >
         <Navbar />
         <main>
-            <p class="text-center text-lg font-semibold">hallo</p>
             <Hero v-reveal />
             <Pricing v-reveal />
             <Features v-reveal />
