@@ -15,6 +15,11 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // Aplikasi berjalan di balik reverse proxy yang meng-terminate TLS
+        // (mis. nginx/host panel). Tanpa ini, Laravel melihat request sebagai
+        // http:// dan menghasilkan URL aset/redirect http (mixed content).
+        $middleware->trustProxies(at: '*');
+
         $middleware->web(append: [
             HandleInertiaRequests::class,
             AddLinkHeadersForPreloadedAssets::class,
