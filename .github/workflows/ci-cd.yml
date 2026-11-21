@@ -47,12 +47,14 @@ jobs:
         with:
           persist-credentials: false
 
-      # Pasang PHP 8.3 + Composer v2 di runner.
+      # Pasang PHP 8.5 + Composer v2 di runner.
+      # Harus sama dengan versi di Dockerfile (8.5.x) karena composer.lock
+      # dikunci untuk paket yang butuh PHP >= 8.4.1 (symfony 8.1, pest 5, dll).
       # coverage: none -> tidak memasang xdebug, job jauh lebih cepat.
       - name: Setup PHP
         uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2
         with:
-          php-version: '8.3'
+          php-version: '8.5'
           tools: composer:v2
           coverage: none
 
