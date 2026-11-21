@@ -47,17 +47,17 @@ defineProps<{ admin: Admin }>();
 
                     <!-- Profil Card -->
                     <div class="rounded-xl border bg-card shadow-sm">
-                        <div class="p-6 border-b">
+                        <div class="border-b p-6">
                             <h3 class="text-base font-semibold">Profil</h3>
-                            <p class="text-sm text-muted-foreground mt-1">
+                            <p class="mt-1 text-sm text-muted-foreground">
                                 Informasi dasar akun Anda.
                             </p>
                         </div>
-                        <div class="p-6 space-y-4">
+                        <div class="space-y-4 p-6">
                             <div class="grid gap-4 sm:grid-cols-2">
                                 <div class="space-y-2">
                                     <label
-                                        class="text-sm font-medium leading-none"
+                                        class="text-sm leading-none font-medium"
                                         >Nama</label
                                     >
                                     <div
@@ -68,7 +68,7 @@ defineProps<{ admin: Admin }>();
                                 </div>
                                 <div class="space-y-2">
                                     <label
-                                        class="text-sm font-medium leading-none"
+                                        class="text-sm leading-none font-medium"
                                         >Email</label
                                     >
                                     <div
@@ -79,14 +79,14 @@ defineProps<{ admin: Admin }>();
                                 </div>
                                 <div class="space-y-2">
                                     <label
-                                        class="text-sm font-medium leading-none"
+                                        class="text-sm leading-none font-medium"
                                         >Role</label
                                     >
                                     <div
                                         class="flex h-9 w-full rounded-md border border-input bg-white px-3 py-1 text-sm shadow-sm"
                                     >
                                         <span
-                                            class="inline-flex items-center rounded-md bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-600/20"
+                                            class="inline-flex items-center rounded-md bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-700 ring-1 ring-blue-600/20 ring-inset"
                                         >
                                             {{ admin.role }}
                                         </span>
@@ -98,16 +98,14 @@ defineProps<{ admin: Admin }>();
 
                     <!-- Preferensi Card -->
                     <div class="rounded-xl border bg-card shadow-sm">
-                        <div class="p-6 border-b">
+                        <div class="border-b p-6">
                             <h3 class="text-base font-semibold">Preferensi</h3>
-                            <p class="text-sm text-muted-foreground mt-1">
+                            <p class="mt-1 text-sm text-muted-foreground">
                                 Pengaturan tampilan dan notifikasi.
                             </p>
                         </div>
-                        <div class="p-6 space-y-4">
-                            <div
-                                class="flex items-center justify-between py-2"
-                            >
+                        <div class="space-y-4 p-6">
+                            <div class="flex items-center justify-between py-2">
                                 <div>
                                     <p class="text-sm font-medium">
                                         Notifikasi Email
@@ -120,12 +118,12 @@ defineProps<{ admin: Admin }>();
                                     class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-blue-600 transition-colors"
                                 >
                                     <span
-                                        class="pointer-events-none block h-5 w-5 rounded-full bg-white shadow-lg ring-0 transition-transform translate-x-5"
+                                        class="pointer-events-none block h-5 w-5 translate-x-5 rounded-full bg-white shadow-lg ring-0 transition-transform"
                                     ></span>
                                 </div>
                             </div>
                             <div
-                                class="flex items-center justify-between py-2 border-t"
+                                class="flex items-center justify-between border-t py-2"
                             >
                                 <div>
                                     <p class="text-sm font-medium">
@@ -139,7 +137,7 @@ defineProps<{ admin: Admin }>();
                                     class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-gray-200 transition-colors"
                                 >
                                     <span
-                                        class="pointer-events-none block h-5 w-5 rounded-full bg-white shadow-lg ring-0 transition-transform translate-x-0"
+                                        class="pointer-events-none block h-5 w-5 translate-x-0 rounded-full bg-white shadow-lg ring-0 transition-transform"
                                     ></span>
                                 </div>
                             </div>

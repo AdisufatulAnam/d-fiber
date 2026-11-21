@@ -79,18 +79,18 @@ const toneClasses: Record<Stat['tone'], string> = {
                         <div
                             v-for="stat in stats"
                             :key="stat.label"
-                            class="rounded-lg sm:rounded-xl border bg-card p-2 sm:p-6 text-card-foreground shadow-sm"
+                            class="rounded-lg border bg-card p-2 text-card-foreground shadow-sm sm:rounded-xl sm:p-6"
                         >
                             <div
                                 class="flex items-center justify-between gap-1 sm:gap-3"
                             >
                                 <p
-                                    class="text-[10px] sm:text-sm font-medium text-muted-foreground leading-tight"
+                                    class="text-[10px] leading-tight font-medium text-muted-foreground sm:text-sm"
                                 >
                                     {{ stat.label }}
                                 </p>
                                 <span
-                                    class="hidden sm:grid h-9 w-9 shrink-0 place-items-center rounded-lg"
+                                    class="hidden h-9 w-9 shrink-0 place-items-center rounded-lg sm:grid"
                                     :class="toneClasses[stat.tone]"
                                 >
                                     <span
@@ -99,11 +99,13 @@ const toneClasses: Record<Stat['tone'], string> = {
                                 </span>
                             </div>
                             <p
-                                class="mt-1.5 sm:mt-3 text-base sm:text-3xl font-bold tracking-tight text-foreground"
+                                class="mt-1.5 text-base font-bold tracking-tight text-foreground sm:mt-3 sm:text-3xl"
                             >
                                 {{ stat.value }}
                             </p>
-                            <p class="mt-0.5 sm:mt-1 text-[9px] sm:text-xs text-muted-foreground leading-tight line-clamp-2">
+                            <p
+                                class="mt-0.5 line-clamp-2 text-[9px] leading-tight text-muted-foreground sm:mt-1 sm:text-xs"
+                            >
                                 {{ stat.hint }}
                             </p>
                         </div>
@@ -115,10 +117,12 @@ const toneClasses: Record<Stat['tone'], string> = {
                             class="rounded-xl border bg-card text-card-foreground shadow-sm lg:col-span-2"
                         >
                             <div class="p-6 pt-6">
-                                <h3 class="text-lg font-semibold leading-none tracking-tight">
+                                <h3
+                                    class="text-lg leading-none font-semibold tracking-tight"
+                                >
                                     Aktivitas Terbaru
                                 </h3>
-                                <p class="text-sm text-muted-foreground mt-1.5">
+                                <p class="mt-1.5 text-sm text-muted-foreground">
                                     Update operasional terakhir dari lapangan.
                                 </p>
                             </div>

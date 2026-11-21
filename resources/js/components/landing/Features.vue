@@ -54,8 +54,8 @@ const features = [
                     Lebih dari Sekadar Internet
                 </h2>
                 <p class="mt-4 text-base text-slate-600 dark:text-slate-400">
-                    Wijinet hadir dengan koneksi dan layanan yang dirancang untuk
-                    kebutuhan Anda.
+                    Wijinet hadir dengan koneksi dan layanan yang dirancang
+                    untuk kebutuhan Anda.
                 </p>
             </div>
 

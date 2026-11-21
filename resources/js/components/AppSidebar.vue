@@ -25,11 +25,44 @@
                             @click="navigate('/admin/dashboard')"
                             :class="
                                 isActive('/admin/dashboard')
-                                    ? 'bg-blue-50 text-blue-700 font-medium'
+                                    ? 'bg-blue-50 font-medium text-blue-700'
                                     : 'text-gray-700 hover:bg-gray-50'
                             "
                         >
-                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="18"
+                                height="18"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            >
+                                <rect width="7" height="9" x="3" y="3" rx="1" />
+                                <rect
+                                    width="7"
+                                    height="5"
+                                    x="14"
+                                    y="3"
+                                    rx="1"
+                                />
+                                <rect
+                                    width="7"
+                                    height="9"
+                                    x="14"
+                                    y="12"
+                                    rx="1"
+                                />
+                                <rect
+                                    width="7"
+                                    height="5"
+                                    x="3"
+                                    y="16"
+                                    rx="1"
+                                />
+                            </svg>
                             <span>Dashboard</span>
                         </SidebarMenuButton>
                     </SidebarMenuItem>
@@ -39,11 +72,30 @@
                             @click="navigate('/admin/payments')"
                             :class="
                                 isActive('/admin/payments')
-                                    ? 'bg-blue-50 text-blue-700 font-medium'
+                                    ? 'bg-blue-50 font-medium text-blue-700'
                                     : 'text-gray-700 hover:bg-gray-50'
                             "
                         >
-                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="18"
+                                height="18"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            >
+                                <rect
+                                    width="20"
+                                    height="14"
+                                    x="2"
+                                    y="5"
+                                    rx="2"
+                                />
+                                <line x1="2" x2="22" y1="10" y2="10" />
+                            </svg>
                             <span>Pembayaran</span>
                         </SidebarMenuButton>
                     </SidebarMenuItem>
@@ -53,11 +105,28 @@
                             @click="navigate('/admin/customers')"
                             :class="
                                 isActive('/admin/customers')
-                                    ? 'bg-blue-50 text-blue-700 font-medium'
+                                    ? 'bg-blue-50 font-medium text-blue-700'
                                     : 'text-gray-700 hover:bg-gray-50'
                             "
                         >
-                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="18"
+                                height="18"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            >
+                                <path
+                                    d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"
+                                />
+                                <circle cx="9" cy="7" r="4" />
+                                <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                            </svg>
                             <span>Pelanggan</span>
                         </SidebarMenuButton>
                     </SidebarMenuItem>
@@ -101,7 +170,7 @@
 
                 <!-- User Info -->
                 <div
-                    class="flex items-center gap-2.5 px-2 py-2 rounded-lg hover:bg-sidebar-accent transition-colors cursor-pointer"
+                    class="flex cursor-pointer items-center gap-2.5 rounded-lg px-2 py-2 transition-colors hover:bg-sidebar-accent"
                     @click="showLogout = true"
                 >
                     <div
@@ -111,11 +180,11 @@
                     </div>
                     <div class="flex flex-col overflow-hidden">
                         <span
-                            class="text-sm font-medium text-sidebar-foreground truncate"
+                            class="truncate text-sm font-medium text-sidebar-foreground"
                             >{{ admin?.name }}</span
                         >
                         <span
-                            class="text-xs text-sidebar-foreground/60 truncate"
+                            class="truncate text-xs text-sidebar-foreground/60"
                             >{{ admin?.email }}</span
                         >
                     </div>
@@ -131,7 +200,7 @@
                 @click.self="showLogout = false"
             >
                 <div
-                    class="bg-white rounded-xl shadow-xl p-6 w-full max-w-sm mx-4 space-y-4"
+                    class="mx-4 w-full max-w-sm space-y-4 rounded-xl bg-white p-6 shadow-xl"
                 >
                     <h3 class="text-lg font-semibold text-gray-900">
                         Keluar dari akun?
@@ -142,13 +211,13 @@
                     <div class="flex justify-end gap-2">
                         <button
                             @click="showLogout = false"
-                            class="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                            class="rounded-lg px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100"
                         >
                             Batal
                         </button>
                         <button
                             @click="logout"
-                            class="px-4 py-2 text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 rounded-lg transition-colors"
+                            class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
                         >
                             Keluar
                         </button>

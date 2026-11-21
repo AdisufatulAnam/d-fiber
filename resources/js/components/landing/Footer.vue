@@ -59,7 +59,9 @@ const supportHref = waLink(
                                 />
                             </svg>
                         </span>
-                        <span class="text-lg font-bold text-white">Wijinet</span>
+                        <span class="text-lg font-bold text-white"
+                            >Wijinet</span
+                        >
                     </div>
                     <p class="mt-4 text-sm leading-relaxed text-slate-400">
                         Internet Cepat. Stabil. Terjangkau. Layanan internet

@@ -15,13 +15,17 @@ defineProps<{
     <SidebarProvider>
         <AppSidebar :admin="admin" />
         <SidebarInset>
-            <header class="flex h-10 shrink-0 items-center gap-2 border-b border-gray-300 bg-background px-4">
+            <header
+                class="flex h-10 shrink-0 items-center gap-2 border-b border-gray-300 bg-background px-4"
+            >
                 <SidebarTrigger />
                 <Separator orientation="vertical" class="mr-2 h-4" />
                 <span class="text-sm font-medium">{{ title }}</span>
             </header>
 
-            <div class="@container/main flex flex-1 min-h-0 flex-col overflow-hidden">
+            <div
+                class="@container/main flex min-h-0 flex-1 flex-col overflow-hidden"
+            >
                 <slot />
             </div>
         </SidebarInset>

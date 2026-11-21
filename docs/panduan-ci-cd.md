@@ -37,13 +37,13 @@ Anda push ke main
 
 Konsep kunci:
 
-| Komponen | Fungsi |
-|---|---|
-| **GitHub Actions** | Mesin CI/CD yang menjalankan test, build, dan perintah deploy |
-| **GHCR** (ghcr.io) | Gudang image Docker milik GitHub, menyimpan hasil build |
-| **Tailscale** | VPN pribadi: server home "masuk" jaringan yang sama dengan runner GitHub, jadi bisa di-SSH tanpa IP publik / port forwarding |
-| **`docker-compose.prod.yml`** | Compose versi produksi (image dari GHCR, bukan build lokal) |
-| **`.env` di server** | Konfigurasi produksi (APP_KEY, DB, dll) — **tidak pernah di-commit** |
+| Komponen                      | Fungsi                                                                                                                       |
+| ----------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| **GitHub Actions**            | Mesin CI/CD yang menjalankan test, build, dan perintah deploy                                                                |
+| **GHCR** (ghcr.io)            | Gudang image Docker milik GitHub, menyimpan hasil build                                                                      |
+| **Tailscale**                 | VPN pribadi: server home "masuk" jaringan yang sama dengan runner GitHub, jadi bisa di-SSH tanpa IP publik / port forwarding |
+| **`docker-compose.prod.yml`** | Compose versi produksi (image dari GHCR, bukan build lokal)                                                                  |
+| **`.env` di server**          | Konfigurasi produksi (APP_KEY, DB, dll) — **tidak pernah di-commit**                                                         |
 
 File yang terlibat di repository:
 
@@ -59,13 +59,13 @@ Buka: **repository → Settings → Secrets and variables → Actions → Secret
 
 Buat **5 secret** berikut:
 
-| Nama Secret | Isi | Cara mendapatkannya |
-|---|---|---|
-| `TS_AUTHKEY` | Auth key Tailscale | Langkah 2.1 |
-| `DEPLOY_HOST` | IP Tailscale server home (`100.x.x.x`) | Langkah 3.2 |
-| `DEPLOY_USER` | Username SSH di server | Langkah 3.3 (mis. `ho`) |
-| `DEPLOY_PATH` | Direktori deploy di server | Langkah 3.4 (mis. `/home/ho/dfiber`) |
-| `DEPLOY_SSH_KEY` | Private key SSH (multiline) | Langkah 3.3 |
+| Nama Secret      | Isi                                    | Cara mendapatkannya                  |
+| ---------------- | -------------------------------------- | ------------------------------------ |
+| `TS_AUTHKEY`     | Auth key Tailscale                     | Langkah 2.1                          |
+| `DEPLOY_HOST`    | IP Tailscale server home (`100.x.x.x`) | Langkah 3.2                          |
+| `DEPLOY_USER`    | Username SSH di server                 | Langkah 3.3 (mis. `ho`)              |
+| `DEPLOY_PATH`    | Direktori deploy di server             | Langkah 3.4 (mis. `/home/ho/dfiber`) |
+| `DEPLOY_SSH_KEY` | Private key SSH (multiline)            | Langkah 3.3                          |
 
 ### 2.1 Membuat Auth Key Tailscale
 
@@ -80,7 +80,7 @@ Buat **5 secret** berikut:
 # 4. Copy key (awalan tskey-auth-...) → simpan sebagai secret TS_AUTHKEY
 ```
 
-> **Keamanan:** auth key hanya bisa *menambahkan* device ke tailnet Anda,
+> **Keamanan:** auth key hanya bisa _menambahkan_ device ke tailnet Anda,
 > tidak bisa membaca data. Simpan sebagai secret, jangan pernah di-commit.
 
 ### 2.2 Secret lainnya
@@ -265,7 +265,7 @@ echo "TOKEN_HASIL_COPAS" | docker login ghcr.io -u Adisufatulanam --password-std
 # Kredensial tersimpan di ~/.docker/config.json (otomatis dipakai saat docker pull)
 ```
 
-> Alternatif (lebih simpel tapi kurang aman): buat package image *public*
+> Alternatif (lebih simpel tapi kurang aman): buat package image _public_
 > di halaman Packages GitHub → Settings → Change visibility.
 > **Tidak disarankan** karena image berisi source code lengkap.
 
@@ -351,23 +351,23 @@ docker compose -f docker-compose.prod.yml up -d
 
 ## 6. Troubleshooting
 
-| Gejala | Penyebab | Solusi |
-|---|---|---|
-| Job Deploy gagal di step "Hubungkan runner ke Tailscale" | Auth key salah/kedaluwarsa, atau server offline | Regenerate key di admin Tailscale → update secret `TS_AUTHKEY`; cek `tailscale status` di server |
-| `ping failed` / job deploy gagal sebelum SSH | Server home tidak terjangkau dari tailnet | Di server: `sudo systemctl status tailscaled`, `sudo tailscale up` |
-| `pull access denied for ghcr.io/...` | Server belum login GHCR / PAT kedaluwarsa | Ulangi Langkah 3.5 (`docker login ghcr.io`) |
-| `env file .env not found` | `~/dfiber/.env` belum dibuat | Buat sesuai Langkah 3.4 |
-| Deploy gagal di `migrate` (`Connection refused`) | MySQL tidak jalan atau kredensial salah | Cek `sudo systemctl status mysql`, cocokkan `DB_*` di `.env` |
-| Smoke test gagal (aplikasi tidak merespons) | Ada error saat boot aplikasi | Lihat log: `docker compose -f docker-compose.prod.yml logs --tail=100 app` |
-| Job Test gagal di `composer setup` bagian migrate | Perubahan migrasi belum kompatibel / DB CI bermasalah | Baca log job Test di Actions; jalankan test lokal: `composer ci:check` |
-| Job Test gagal di `npm run check` / `vue-tsc` | Error lint/type frontend | Perbaiki lokal: `npm run check:fix`, `npm run types:check` |
-| Deploy jalan tapi tampilan lama | Browser cache aset | Hard refresh (Cmd+Shift+R); pastikan tag image berubah di GHCR |
-| `Permission denied (publickey)` saat test SSH | Public key belum terpasang / permission salah | Cek `~/.ssh/authorized_keys` (harus `chmod 600`, `~/.ssh` harus `chmod 700`) |
+| Gejala                                                   | Penyebab                                              | Solusi                                                                                           |
+| -------------------------------------------------------- | ----------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| Job Deploy gagal di step "Hubungkan runner ke Tailscale" | Auth key salah/kedaluwarsa, atau server offline       | Regenerate key di admin Tailscale → update secret `TS_AUTHKEY`; cek `tailscale status` di server |
+| `ping failed` / job deploy gagal sebelum SSH             | Server home tidak terjangkau dari tailnet             | Di server: `sudo systemctl status tailscaled`, `sudo tailscale up`                               |
+| `pull access denied for ghcr.io/...`                     | Server belum login GHCR / PAT kedaluwarsa             | Ulangi Langkah 3.5 (`docker login ghcr.io`)                                                      |
+| `env file .env not found`                                | `~/dfiber/.env` belum dibuat                          | Buat sesuai Langkah 3.4                                                                          |
+| Deploy gagal di `migrate` (`Connection refused`)         | MySQL tidak jalan atau kredensial salah               | Cek `sudo systemctl status mysql`, cocokkan `DB_*` di `.env`                                     |
+| Smoke test gagal (aplikasi tidak merespons)              | Ada error saat boot aplikasi                          | Lihat log: `docker compose -f docker-compose.prod.yml logs --tail=100 app`                       |
+| Job Test gagal di `composer setup` bagian migrate        | Perubahan migrasi belum kompatibel / DB CI bermasalah | Baca log job Test di Actions; jalankan test lokal: `composer ci:check`                           |
+| Job Test gagal di `npm run check` / `vue-tsc`            | Error lint/type frontend                              | Perbaiki lokal: `npm run check:fix`, `npm run types:check`                                       |
+| Deploy jalan tapi tampilan lama                          | Browser cache aset                                    | Hard refresh (Cmd+Shift+R); pastikan tag image berubah di GHCR                                   |
+| `Permission denied (publickey)` saat test SSH            | Public key belum terpasang / permission salah         | Cek `~/.ssh/authorized_keys` (harus `chmod 600`, `~/.ssh` harus `chmod 700`)                     |
 
 ### Menambah/mengubah secret
 
 GitHub → repository → **Settings → Secrets and variables → Actions** → klik
-secret → *Update* / *Delete*.
+secret → _Update_ / _Delete_.
 
 ### Menambah environment variables baru untuk aplikasi
 
