@@ -67,6 +67,9 @@ Buat **5 secret** berikut:
 | `DEPLOY_PATH`    | Direktori deploy di server             | Langkah 3.4 (mis. `/home/ho/dfiber`) |
 | `DEPLOY_SSH_KEY` | Private key SSH (multiline)            | Langkah 3.3                          |
 
+
+
+
 ### 2.1 Membuat Auth Key Tailscale
 
 ```bash
