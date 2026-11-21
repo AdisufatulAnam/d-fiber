@@ -37,7 +37,7 @@
                     Wijinet
                 </p>
                 <p class="text-xs font-medium text-slate-500">
-                    Panel Admin Operasional
+                    Panel Admin Operasional Test 21
                 </p>
             </div>
         </div>
