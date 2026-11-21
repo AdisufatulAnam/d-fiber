@@ -1,0 +1,58 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Contoh step pipeline (ubah sesuai kebutuhan project kamu)
+      - name: Automated Testing
+        id: test
+        run: echo "Running tests..."
+
+      - name: Docker Build
+        id: docker
+        run: echo "Building docker image..."
+
+      - name: Push to GHCR
+        id: ghcr
+        run: echo "Pushing to GHCR..."
+
+      - name: Tailscale
+        id: tailscale
+        run: echo "Connecting tailscale..."
+
+      - name: SSH Deployment
+        id: ssh
+        run: echo "Deploying via SSH..."
+
+      - name: Health Check
+        id: health
+        run: echo "Checking health..."
+
+      - name: Send Discord Notification (Success)
+        if: success()
+        run: |
+          PAYLOAD=$(cat <<EOM
+          {
+            "content": "```pesan\n🚀 CI/CD DEPLOYMENT SUCCESS\n\n📦 Project : ${{ github.event.repository.name }}\n🌿 Branch  : ${{ github.ref_name }}\n👤 Author  : ${{ github.actor }}\n🔖 Commit  : ${{ github.sha }}\n\n📋 PIPELINE RESULTS\n━━━━━━━━━━━━━━━━━━━━\n✅ Automated Testing : SUCCESS\n✅ Docker Build      : SUCCESS\n✅ Push to GHCR      : SUCCESS\n✅ Tailscale         : CONNECTED\n✅ SSH Deployment    : SUCCESS\n✅ Health Check      : HEALTHY\n━━━━━━━━━━━━━━━━━━━━\n\n🖥️ Server : server01\n🐳 Docker : Running\n🌐 URL    : https://app.example.com\n\n⏱️ Duration : 2m 00s\n\n🎉 Application successfully deployed!\n\n🔗 GitHub Actions:\n${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\n```"
+          }
+          EOM
+          )
+          curl -H "Content-Type: application/json" -d "$PAYLOAD" ${{ secrets.DISCORD_WEBHOOK_URL }}
+
+      - name: Send Discord Notification (Failure)
+        if: failure()
+        run: |
+          PAYLOAD=$(cat <<EOM
+          {
+            "content": "```pesan\n🚨 CI/CD DEPLOYMENT FAILED\n\n📦 Project : ${{ github.event.repository.name }}\n🌿 Branch  : ${{ github.ref_name }}\n👤 Author  : ${{ github.actor }}\n🔖 Commit  : ${{ github.sha }}\n\n📋 PIPELINE RESULTS\n━━━━━━━━━━━━━━━━━━━━\n${{ steps.test.outcome == 'success' && '✅' || (steps.test.outcome == 'failure' && '❌' || '⏭️') }} Automated Testing : ${{ steps.test.outcome == 'success' && 'SUCCESS' || (steps.test.outcome == 'failure' && 'FAILED' || 'SKIPPED') }}\n${{ steps.docker.outcome == 'success' && '✅' || (steps.docker.outcome == 'failure' && '❌' || '⏭️') }} Docker Build      : ${{ steps.docker.outcome == 'success' && 'SUCCESS' || (steps.docker.outcome == 'failure' && 'FAILED' || 'SKIPPED') }}\n${{ steps.ghcr.outcome == 'success' && '✅' || (steps.ghcr.outcome == 'failure' && '❌' || '⏭️') }} Push to GHCR      : ${{ steps.ghcr.outcome == 'success' && 'SUCCESS' || (steps.ghcr.outcome == 'failure' && 'FAILED' || 'SKIPPED') }}\n${{ steps.tailscale.outcome == 'success' && '✅' || (steps.tailscale.outcome == 'failure' && '❌' || '⏭️') }} Tailscale         : ${{ steps.tailscale.outcome == 'success' && 'CONNECTED' || (steps.tailscale.outcome == 'failure' && 'FAILED' || 'SKIPPED') }}\n${{ steps.ssh.outcome == 'success' && '✅' || (steps.ssh.outcome == 'failure' && '❌' || '⏭️') }} SSH Deployment    : ${{ steps.ssh.outcome == 'success' && 'SUCCESS' || (steps.ssh.outcome == 'failure' && 'FAILED' || 'SKIPPED') }}\n${{ steps.health.outcome == 'success' && '✅' || (steps.health.outcome == 'failure' && '❌' || '⏭️') }} Health Check      : ${{ steps.health.outcome == 'success' && 'HEALTHY' || (steps.health.outcome == 'failure' && 'FAILED' || 'SKIPPED') }}\n━━━━━━━━━━━━━━━━━━━━\n\n🖥️ Server : server01\n📊 Status : Deployment not executed\n\n🔍 Please check GitHub Actions logs.\n\n🔗 GitHub Actions:\n${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\n```"
+          }
+          EOM
+          )
+          curl -H "Content-Type: application/json" -d "$PAYLOAD" ${{ secrets.DISCORD_WEBHOOK_URL }}

@@ -170,6 +170,42 @@ jobs:
       tag: ${{ steps.meta.outputs.version }} # contoh: main
 
   # ===========================================================================
+  # NOTIFIKASI (SUCCESS / FAILURE)
+  # Mengirim webhook (misal Telegram/Discord) berdasarkan status keseluruhan workflow.
+  # ===========================================================================
+  notify:
+    name: "Notifikasi CI/CD"
+    needs: [test, build, deploy]
+    if: always() # Tetap jalan walau test, build, atau deploy ada yang gagal
+    runs-on: ubuntu-latest
+    steps:
+      - name: Kirim Notifikasi Sukses
+        if: ${{ needs.test.result == 'success' && needs.build.result == 'success' && (needs.deploy.result == 'success' || needs.deploy.result == 'skipped') && github.event_name == 'push' }}
+        env:
+          WEBHOOK_URL: ${{ secrets.CI_NOTIFICATION_WEBHOOK }}
+        run: |
+          if [ -n "${WEBHOOK_URL:-}" ]; then
+            curl -s -X POST "$WEBHOOK_URL" \
+              -H "Content-Type: application/json" \
+              -d "{\"content\": \"✅ *CI/CD Sukses!*\nRepository: \`${{ github.repository }}\`\nBranch: \`${{ github.ref_name }}\`\nCommit: \`${{ github.sha }}\`\nAuthor: \`${{ github.actor }}\`\"}"
+          else
+            echo "WEBHOOK_URL belum diset di GitHub Secrets."
+          fi
+
+      - name: Kirim Notifikasi Gagal
+        if: ${{ needs.test.result == 'failure' || needs.build.result == 'failure' || needs.deploy.result == 'failure' }}
+        env:
+          WEBHOOK_URL: ${{ secrets.CI_NOTIFICATION_WEBHOOK }}
+        run: |
+          if [ -n "${WEBHOOK_URL:-}" ]; then
+            curl -s -X POST "$WEBHOOK_URL" \
+              -H "Content-Type: application/json" \
+              -d "{\"content\": \"❌ *CI/CD Gagal!*\nRepository: \`${{ github.repository }}\`\nBranch: \`${{ github.ref_name }}\`\nCommit: \`${{ github.sha }}\`\nAuthor: \`${{ github.actor }}\`\n[Lihat Detail Aksi]($ {GITHUB_SERVER_URL}/${{ github.repository }}/actions/runs/${{ github.run_id }})\"}"
+          else
+            echo "WEBHOOK_URL belum diset di GitHub Secrets."
+          fi
+
+  # ===========================================================================
   # JOB 3/3 - DEPLOY KE SERVER HOME
   # SSH ke server home lewat Tailscale (server tidak butuh IP publik).
   # ===========================================================================
