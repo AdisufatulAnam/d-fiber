@@ -4,12 +4,6 @@ namespace App\DTOs;
 
 class UserDTO
 {
-    /**
-     * @param string $name
-     * @param string $email
-     * @param string $password
-     * @param string|null $avatar
-     */
     public function __construct(
         public readonly string $name,
         public readonly string $email,
@@ -19,6 +13,8 @@ class UserDTO
 
     /**
      * Convert to array
+     *
+     * @return array{name: string, email: string, password: string, avatar: string|null}
      */
     public function toArray(): array
     {
@@ -32,6 +28,8 @@ class UserDTO
 
     /**
      * Create from request
+     *
+     * @param  array<string, mixed>  $request
      */
     public static function fromRequest(array $request): self
     {

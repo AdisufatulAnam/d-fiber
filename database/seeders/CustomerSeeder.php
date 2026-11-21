@@ -33,7 +33,7 @@ class CustomerSeeder extends Seeder
             ['name' => 'Fitri Handayani',     'phone' => '081234567810', 'address' => 'Jl. Flamboyan No. 9',       'qr_code' => 'DFB-K7L8M9N0'],
             ['name' => 'Agus Prasetyo',      'phone' => '081234567811', 'address' => 'Jl. Mawar No. 30',          'qr_code' => 'DFB-O1P2Q3R4'],
             ['name' => 'Lina Kartika',       'phone' => '081234567812', 'address' => 'Jl. Dahlia No. 12',         'qr_code' => 'DFB-S5T6U7V8'],
-            ['name' => 'Toko Berkah Jaya',   'phone' => '081234567813', 'address' => 'Jl. Pasar Baru Blok C No. 5','qr_code' => 'DFB-W9X0Y1Z2'],
+            ['name' => 'Toko Berkah Jaya',   'phone' => '081234567813', 'address' => 'Jl. Pasar Baru Blok C No. 5', 'qr_code' => 'DFB-W9X0Y1Z2'],
             ['name' => 'CV Maju Mundur',     'phone' => '081234567814', 'address' => 'Jl. Industri No. 88',       'qr_code' => 'DFB-A3B4C5D6'],
             ['name' => 'Warung Enak Selera', 'phone' => '081234567815', 'address' => 'Jl. Kuliner No. 3',         'qr_code' => 'DFB-E7F8G9H0'],
         ];
@@ -42,6 +42,10 @@ class CustomerSeeder extends Seeder
             $data['package_id'] = $packages[array_rand($packages)];
             $customer = Customer::create($data);
             $package = Package::find($data['package_id']);
+
+            if (! $package instanceof Package) {
+                continue;
+            }
 
             // Buat tagihan 6 bulan terakhir sesuai harga paket
             $startMonth = now()->subMonthsNoOverflow(5)->startOfMonth();
@@ -52,14 +56,14 @@ class CustomerSeeder extends Seeder
                 $method = rand(0, 10) > 4 ? 'qrcode' : 'manual';
 
                 Payment::create([
-                    'customer_id'    => $customer->id,
-                    'customer_name'  => $customer->name,
-                    'billing_month'  => $billingMonth,
-                    'amount'         => $package->price,
+                    'customer_id' => $customer->id,
+                    'customer_name' => $customer->name,
+                    'billing_month' => $billingMonth,
+                    'amount' => $package->price,
                     'payment_method' => $method,
-                    'reference'      => $method === 'qrcode' ? 'QR-' . strtoupper(bin2hex(random_bytes(3))) : null,
-                    'status'         => $status,
-                    'notes'          => "Tagihan {$package->name}",
+                    'reference' => $method === 'qrcode' ? 'QR-'.strtoupper(bin2hex(random_bytes(3))) : null,
+                    'status' => $status,
+                    'notes' => "Tagihan {$package->name}",
                 ]);
             }
         }

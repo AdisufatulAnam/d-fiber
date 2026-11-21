@@ -7,17 +7,20 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @template TModel of Model
+ *
+ * @implements RepositoryInterface<TModel>
+ */
 abstract class BaseRepository implements RepositoryInterface
 {
-    /**
-     * @var Model
-     */
+    /** @var TModel */
     protected Model $model;
 
     /**
      * BaseRepository constructor.
      *
-     * @param Model $model
+     * @param  TModel  $model
      */
     public function __construct(Model $model)
     {
@@ -27,7 +30,7 @@ abstract class BaseRepository implements RepositoryInterface
     /**
      * Get all records
      *
-     * @return Collection
+     * @return Collection<int, TModel>
      */
     public function all(): Collection
     {
@@ -37,55 +40,49 @@ abstract class BaseRepository implements RepositoryInterface
     /**
      * Find record by ID
      *
-     * @param int $id
-     * @return Model|null
+     * @return TModel|null
      */
     public function find(int $id): ?Model
     {
-        return $this->model->find($id);
+        return $this->model->newQuery()->find($id);
     }
 
     /**
      * Find record by field and value
      *
-     * @param string $field
-     * @param string $value
-     * @return Model|null
+     * @return TModel|null
      */
     public function findBy(string $field, string $value): ?Model
     {
-        return $this->model->where($field, $value)->first();
+        return $this->model->newQuery()->where($field, $value)->first();
     }
 
     /**
      * Get all records where field equals value
      *
-     * @param string $field
-     * @param string $value
-     * @return Collection
+     * @return Collection<int, TModel>
      */
     public function getBy(string $field, string $value): Collection
     {
-        return $this->model->where($field, $value)->get();
+        return $this->model->newQuery()->where($field, $value)->get();
     }
 
     /**
      * Create a new record
      *
-     * @param array $data
-     * @return Model
+     * @param  array<string, mixed>  $data
+     * @return TModel
      */
     public function create(array $data): Model
     {
-        return $this->model->create($data);
+        return $this->model->newQuery()->create($data);
     }
 
     /**
      * Update a record
      *
-     * @param int $id
-     * @param array $data
-     * @return Model|null
+     * @param  array<string, mixed>  $data
+     * @return TModel|null
      */
     public function update(int $id, array $data): ?Model
     {
@@ -93,6 +90,7 @@ abstract class BaseRepository implements RepositoryInterface
 
         if ($record) {
             $record->update($data);
+
             return $record;
         }
 
@@ -101,9 +99,6 @@ abstract class BaseRepository implements RepositoryInterface
 
     /**
      * Delete a record
-     *
-     * @param int $id
-     * @return bool
      */
     public function delete(int $id): bool
     {
@@ -119,43 +114,37 @@ abstract class BaseRepository implements RepositoryInterface
     /**
      * Get records with pagination
      *
-     * @param int $perPage
-     * @param array $columns
-     * @return LengthAwarePaginator
+     * @param  array<int, string>  $columns
+     * @return LengthAwarePaginator<int, TModel>
      */
     public function paginate(int $perPage = 15, array $columns = ['*']): LengthAwarePaginator
     {
-        return $this->model->paginate($perPage, $columns);
+        return $this->model->newQuery()->paginate($perPage, $columns);
     }
 
     /**
      * Search records
      *
-     * @param string $query
-     * @param int $perPage
-     * @return LengthAwarePaginator
+     * @return LengthAwarePaginator<int, TModel>
      */
     public function search(string $query, int $perPage = 15): LengthAwarePaginator
     {
-        return $this->model->paginate($perPage);
+        return $this->model->newQuery()->paginate($perPage);
     }
 
     /**
      * Get the last created record
      *
-     * @param array $columns
-     * @return Model|null
+     * @param  array<int, string>  $columns
+     * @return TModel|null
      */
     public function getLast(array $columns = ['*']): ?Model
     {
-        return $this->model->latest()->first($columns);
+        return $this->model->newQuery()->latest()->first($columns);
     }
 
     /**
      * Check if record exists
-     *
-     * @param int $id
-     * @return bool
      */
     public function exists(int $id): bool
     {
@@ -164,8 +153,6 @@ abstract class BaseRepository implements RepositoryInterface
 
     /**
      * Get count of records
-     *
-     * @return int
      */
     public function count(): int
     {
@@ -175,11 +162,10 @@ abstract class BaseRepository implements RepositoryInterface
     /**
      * Get distinct values of a field
      *
-     * @param string $field
-     * @return Collection
+     * @return Collection<int, TModel>
      */
     public function distinct(string $field): Collection
     {
-        return $this->model->distinct()->get([$field]);
+        return $this->model->newQuery()->distinct()->get([$field]);
     }
 }

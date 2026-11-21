@@ -9,6 +9,8 @@ class RealCustomerSeeder extends Seeder
 {
     /**
      * Data pelanggan nyata: [nama, ip_address].
+     *
+     * @var list<array{string, string}>
      */
     private array $data = [
         ['mbah dukun', '192.168.77.2'],
@@ -99,6 +101,6 @@ class RealCustomerSeeder extends Seeder
             }
         }
 
-        $this->command->info('Pelanggan diperbarui/ditambahkan: ' . count($this->data));
+        $this->command->info('Pelanggan diperbarui/ditambahkan: '.count($this->data));
     }
 }

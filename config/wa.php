@@ -13,7 +13,7 @@ return [
     'enabled' => (bool) env('WA_ENABLED', false),
 
     // Base URL server GoWa (tanpa path endpoint).
-    'base_url' => rtrim(env('WA_API_URL', 'http://127.0.0.1:8810'), '/'),
+    'base_url' => rtrim((string) env('WA_API_URL', 'http://127.0.0.1:8810'), '/'),
 
     // Autentikasi HTTP Basic.
     'username' => env('WA_USERNAME'),

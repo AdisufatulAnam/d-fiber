@@ -3,9 +3,13 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\SendPaymentInvoice;
 use App\Models\Customer;
 use App\Models\Payment;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -73,7 +77,7 @@ class PaymentController extends Controller
     /**
      * API: Cari pelanggan berdasarkan QR code (untuk AJAX).
      */
-    public function findCustomerByQr(Request $request)
+    public function findCustomerByQr(Request $request): JsonResponse
     {
         $request->validate(['qr_code' => 'required|string']);
 
@@ -93,7 +97,7 @@ class PaymentController extends Controller
     /**
      * API: Ambil daftar tagihan milik satu pelanggan (untuk panel bayar).
      */
-    public function customerBills(Customer $customer)
+    public function customerBills(Customer $customer): JsonResponse
     {
         $customer->load('package');
 
@@ -107,7 +111,7 @@ class PaymentController extends Controller
      * Susun tagihan 12 bulan terakhir sesuai paket pelanggan.
      * Bulan yang belum punya record dibuat sebagai tagihan pending.
      *
-     * @return \Illuminate\Support\Collection<int, Payment>
+     * @return Collection<int, Payment>
      */
     private function yearBills(Customer $customer)
     {
@@ -142,7 +146,7 @@ class PaymentController extends Controller
     /**
      * API: Bayar beberapa tagihan sekaligus (multi bulan).
      */
-    public function payBulk(Request $request)
+    public function payBulk(Request $request): JsonResponse
     {
         $validated = $request->validate([
             'ids' => 'required|array|min:1',
@@ -168,7 +172,7 @@ class PaymentController extends Controller
     /**
      * Simpan pembayaran baru.
      */
-    public function store(Request $request)
+    public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
             'customer_id' => 'nullable|exists:customers,id',
@@ -189,7 +193,7 @@ class PaymentController extends Controller
     /**
      * Tambah tagihan bulanan untuk pelanggan.
      */
-    public function addBill(Request $request, Customer $customer)
+    public function addBill(Request $request, Customer $customer): RedirectResponse
     {
         $validated = $request->validate([
             'billing_month' => 'required|string|max:7',
@@ -213,7 +217,7 @@ class PaymentController extends Controller
     /**
      * Update status pembayaran.
      */
-    public function update(Request $request, Payment $payment)
+    public function update(Request $request, Payment $payment): RedirectResponse
     {
         $validated = $request->validate([
             'status' => 'required|in:pending,confirmed,cancelled',
@@ -227,7 +231,7 @@ class PaymentController extends Controller
     /**
      * Batalkan pembayaran (soft delete) — hanya untuk yang sudah lunas.
      */
-    public function cancel(Payment $payment)
+    public function cancel(Payment $payment): RedirectResponse
     {
         if ($payment->status !== 'confirmed') {
             return back()->withErrors(['payment' => 'Hanya pembayaran lunas yang dapat dibatalkan.']);
@@ -241,7 +245,7 @@ class PaymentController extends Controller
     /**
      * Pulihkan pembayaran yang sudah dihapus (soft delete).
      */
-    public function restore(Payment $payment)
+    public function restore(Payment $payment): RedirectResponse
     {
         if (! $payment->trashed()) {
             return back()->withErrors(['payment' => 'Data ini tidak dalam status terhapus.']);
@@ -255,7 +259,7 @@ class PaymentController extends Controller
     /**
      * Kirim ulang nota/invoice WhatsApp untuk pembayaran yang lunas.
      */
-    public function resendWhatsApp(Payment $payment)
+    public function resendWhatsApp(Payment $payment): RedirectResponse
     {
         if ($payment->status !== 'confirmed') {
             return back()->withErrors(['payment' => 'Hanya pembayaran lunas yang dapat dikirim ulang.']);
@@ -265,13 +269,15 @@ class PaymentController extends Controller
             return back()->withErrors(['payment' => 'Fitur WhatsApp dinonaktifkan (WA_ENABLED=false).']);
         }
 
-        \App\Jobs\SendPaymentInvoice::dispatch($payment->id);
+        SendPaymentInvoice::dispatch($payment->id);
 
         return back()->with('success', 'Pengiriman WhatsApp dijadwalkan ulang.');
     }
 
     /**
      * Payload admin untuk sidebar.
+     *
+     * @return array{id: int, name: string, email: string, role: string}
      */
     private function adminPayload(Request $request): array
     {

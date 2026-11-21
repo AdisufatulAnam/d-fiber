@@ -34,13 +34,14 @@ return new class extends Migration
 
         foreach ($confirmed as $payment) {
             $date = substr($payment->created_at, 0, 10);
-            $ymd = date('ymd', strtotime($date));
+            $timestamp = strtotime($date);
+            $ymd = date('ymd', $timestamp === false ? time() : $timestamp);
             $perDay[$date] = ($perDay[$date] ?? 0) + 1;
-            $seq = str_pad($perDay[$date], 5, '0', STR_PAD_LEFT);
+            $seq = sprintf('%05d', $perDay[$date]);
 
             DB::table('payments')
                 ->where('id', $payment->id)
-                ->update(['invoice_number' => 'PAY' . $ymd . $seq]);
+                ->update(['invoice_number' => 'PAY'.$ymd.$seq]);
         }
     }
 };

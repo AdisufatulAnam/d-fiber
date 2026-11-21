@@ -3,16 +3,17 @@
 namespace App\Repositories;
 
 use App\Models\User;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * @extends BaseRepository<User>
+ */
 class UserRepository extends BaseRepository
 {
     /**
      * UserRepository constructor.
-     *
-     * @param User $user
      */
     public function __construct(User $user)
     {
@@ -22,7 +23,7 @@ class UserRepository extends BaseRepository
     /**
      * Get active users
      *
-     * @return Collection
+     * @return Collection<int, User>
      */
     public function getActiveUsers(): Collection
     {
@@ -32,8 +33,7 @@ class UserRepository extends BaseRepository
     /**
      * Get users by role
      *
-     * @param string $role
-     * @return Collection
+     * @return Collection<int, User>
      */
     public function getByRole(string $role): Collection
     {
@@ -43,23 +43,21 @@ class UserRepository extends BaseRepository
     /**
      * Search users by name or email
      *
-     * @param string $query
-     * @return LengthAwarePaginator
+     * @return LengthAwarePaginator<int, User>
      */
     public function searchByNameOrEmail(string $query): LengthAwarePaginator
     {
         return $this->model->where(function ($q) use ($query) {
             $q->where('name', 'like', "%{$query}%")
-              ->orWhere('email', 'like', "%{$query}%");
+                ->orWhere('email', 'like', "%{$query}%");
         })
-        ->paginate(15);
+            ->paginate(15);
     }
 
     /**
      * Get users with pagination ordered by name
      *
-     * @param int $perPage
-     * @return LengthAwarePaginator
+     * @return LengthAwarePaginator<int, User>
      */
     public function getByNameDesc(int $perPage = 15): LengthAwarePaginator
     {
@@ -69,8 +67,7 @@ class UserRepository extends BaseRepository
     /**
      * Get users registered in the last X days
      *
-     * @param int $days
-     * @return Collection
+     * @return Collection<int, User>
      */
     public function registeredInLastDays(int $days = 30): Collection
     {
@@ -86,8 +83,7 @@ class UserRepository extends BaseRepository
     /**
      * 1. Raw Select All or Search with Parameter Binding
      *
-     * @param string|null $search
-     * @return array
+     * @return array<int, object>
      */
     public function rawSelectAll(?string $search): array
     {
@@ -103,22 +99,18 @@ class UserRepository extends BaseRepository
 
     /**
      * 2. Raw Select By ID with Parameter Binding
-     *
-     * @param int $id
-     * @return object|null
      */
     public function rawFindById(int $id): ?object
     {
         $users = DB::select('SELECT * FROM users WHERE id = ? LIMIT 1', [$id]);
 
-        return !empty($users) ? $users[0] : null;
+        return ! empty($users) ? $users[0] : null;
     }
 
     /**
      * 3. Raw Insert with Parameter Binding
      *
-     * @param array $data
-     * @return bool
+     * @param  array<string, mixed>  $data
      */
     public function rawInsert(array $data): bool
     {
@@ -131,9 +123,7 @@ class UserRepository extends BaseRepository
     /**
      * 4. Raw Update with Parameter Binding
      *
-     * @param int $id
-     * @param array $data
-     * @return int
+     * @param  array<string, mixed>  $data
      */
     public function rawUpdate(int $id, array $data): int
     {
@@ -152,9 +142,6 @@ class UserRepository extends BaseRepository
 
     /**
      * 5. Raw Delete with Parameter Binding
-     *
-     * @param int $id
-     * @return int
      */
     public function rawDelete(int $id): int
     {

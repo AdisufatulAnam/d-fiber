@@ -2,14 +2,14 @@
 
 namespace App\Services;
 
-use App\Repositories\UserRepository;
 use App\DTOs\UserDTO;
+use App\Models\User;
+use App\Repositories\UserRepository;
+use Exception;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
-use Exception;
 
 class UserService
 {
@@ -17,8 +17,6 @@ class UserService
 
     /**
      * UserService constructor.
-     *
-     * @param UserRepository $userRepository
      */
     public function __construct(UserRepository $userRepository)
     {
@@ -28,8 +26,7 @@ class UserService
     /**
      * Get paginated users or search results (Eloquent)
      *
-     * @param string|null $search
-     * @return LengthAwarePaginator
+     * @return LengthAwarePaginator<int, User>
      */
     public function getUsersList(?string $search): LengthAwarePaginator
     {
@@ -49,8 +46,7 @@ class UserService
     /**
      * 1. Read All / Search using Raw SQL Repository
      *
-     * @param string|null $search
-     * @return array
+     * @return array<int, object>
      */
     public function getRawUsersList(?string $search): array
     {
@@ -59,9 +55,6 @@ class UserService
 
     /**
      * 2. Read Single User by ID using Raw SQL Repository
-     *
-     * @param int $id
-     * @return object|null
      */
     public function getRawUserById(int $id): ?object
     {
@@ -71,8 +64,6 @@ class UserService
     /**
      * 3. Create User using Raw SQL Repository & Transaction
      *
-     * @param UserDTO $dto
-     * @return bool
      * @throws Exception
      */
     public function createRawUser(UserDTO $dto): bool
@@ -93,7 +84,7 @@ class UserService
             return $result;
         } catch (Exception $e) {
             DB::rollBack();
-            Log::error('Failed to create raw user: ' . $e->getMessage());
+            Log::error('Failed to create raw user: '.$e->getMessage());
             throw new Exception('Could not create user via raw SQL.');
         }
     }
@@ -101,9 +92,8 @@ class UserService
     /**
      * 4. Update User using Raw SQL Repository & Transaction
      *
-     * @param int $id
-     * @param array $data
-     * @return int
+     * @param  array<string, mixed>  $data
+     *
      * @throws Exception
      */
     public function updateRawUser(int $id, array $data): int
@@ -122,7 +112,7 @@ class UserService
             return $affected;
         } catch (Exception $e) {
             DB::rollBack();
-            Log::error('Failed to update raw user ID ' . $id . ': ' . $e->getMessage());
+            Log::error('Failed to update raw user ID '.$id.': '.$e->getMessage());
             throw new Exception('Could not update user via raw SQL.');
         }
     }
@@ -130,8 +120,6 @@ class UserService
     /**
      * 5. Delete User using Raw SQL Repository & Transaction
      *
-     * @param int $id
-     * @return int
      * @throws Exception
      */
     public function deleteRawUser(int $id): int
@@ -146,7 +134,7 @@ class UserService
             return $deleted;
         } catch (Exception $e) {
             DB::rollBack();
-            Log::error('Failed to delete raw user ID ' . $id . ': ' . $e->getMessage());
+            Log::error('Failed to delete raw user ID '.$id.': '.$e->getMessage());
             throw new Exception('Could not delete user via raw SQL.');
         }
     }

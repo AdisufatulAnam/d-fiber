@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Models\Customer;
 use App\Models\Payment;
 use App\Models\PaymentWhatsappLog;
 use App\Services\GoWaService;
@@ -26,7 +27,11 @@ class SendPaymentInvoice implements ShouldQueue
     /** Diisi saat handle berjalan (diambil dari DB, aman terhadap soft delete). */
     public Payment $payment;
 
-    /** Delay antar percobaan ulang (detik) saat gagal. */
+    /**
+     * Delay antar percobaan ulang (detik) saat gagal.
+     *
+     * @var list<int>
+     */
     public array $backoff = [30, 60, 120, 300, 600];
 
     /** ID pembayaran (bukan model) agar aman bila payment dihapus saat antrian. */
@@ -52,7 +57,7 @@ class SendPaymentInvoice implements ShouldQueue
 
         $this->payment = $payment;
         $customer = $payment->customer()->with('package')->first();
-        $phone = $gowa->normalizePhone($customer?->phone ?? null);
+        $phone = $gowa->normalizePhone($customer?->phone);
 
         // Belum ada nomor WhatsApp -> lewati tanpa dianggap gagal.
         if (! $phone) {
@@ -72,6 +77,8 @@ class SendPaymentInvoice implements ShouldQueue
         $log->update(['message' => $message]);
 
         // Lampirkan PDF hanya bila WA_SEND_DOCUMENT=true; selain itu kirim teks saja.
+        $pdfPath = null;
+
         if (config('wa.send_document')) {
             $pdfPath = $this->generatePdf($customer, $phone);
             $log->update(['invoice_file' => $pdfPath]);
@@ -92,7 +99,7 @@ class SendPaymentInvoice implements ShouldQueue
             ]);
 
             // Bersihkan file PDF sementara (jika dibuat).
-            if (config('wa.send_document') && isset($pdfPath)) {
+            if ($pdfPath !== null) {
                 Storage::delete($pdfPath);
             }
 
@@ -128,6 +135,9 @@ class SendPaymentInvoice implements ShouldQueue
         );
     }
 
+    /**
+     * @param  array<string, mixed>  $attrs
+     */
     private function log(string $status, string $phone, array $attrs = []): void
     {
         PaymentWhatsappLog::updateOrCreate(
@@ -136,12 +146,12 @@ class SendPaymentInvoice implements ShouldQueue
         );
     }
 
-    private function buildMessage(?object $customer, string $phone): string
+    private function buildMessage(?Customer $customer, string $phone): string
     {
         $brand = rtrim((string) config('app.url', ''), '/') ?: config('wa.brand', 'wiji.net');
         $periode = $this->payment->billingMonthLabel();
         $nama = $customer->name ?? $this->payment->customer_name;
-        $id = $customer->qr_code ?: ($customer->id ?? '-');
+        $id = $customer?->qr_code ?: ($customer->id ?? '-');
         $total = $this->payment->amountLabel();
 
         $greeting = $this->greeting();
@@ -190,7 +200,7 @@ MSG;
         return $nama.'_'.$inv.'.pdf';
     }
 
-    private function generatePdf(?object $customer, string $phone): string
+    private function generatePdf(?Customer $customer, string $phone): string
     {
         $pdf = Pdf::loadView('pdf.invoice', [
             'payment' => $this->payment,

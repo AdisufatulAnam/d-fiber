@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Customer;
 use App\Models\Package;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -40,13 +41,13 @@ class CustomerController extends Controller
         return Inertia::render('Admin/Customers/Index', [
             'admin' => $this->adminPayload($request),
             'customers' => $customers,
-            'packages' => \App\Models\Package::orderBy('name')->get(['id', 'name', 'price', 'speed']),
+            'packages' => Package::orderBy('name')->get(['id', 'name', 'price', 'speed']),
             'stats' => $stats,
             'filters' => $request->only(['search', 'status']),
         ]);
     }
 
-    public function store(Request $request)
+    public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -63,7 +64,7 @@ class CustomerController extends Controller
         return back()->with('success', 'Pelanggan berhasil ditambahkan.');
     }
 
-    public function update(Request $request, Customer $customer)
+    public function update(Request $request, Customer $customer): RedirectResponse
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -79,7 +80,7 @@ class CustomerController extends Controller
         return back()->with('success', 'Pelanggan berhasil diperbarui.');
     }
 
-    public function destroy(Customer $customer)
+    public function destroy(Customer $customer): RedirectResponse
     {
         $customer->payments()->delete();
         $customer->delete();
@@ -87,9 +88,13 @@ class CustomerController extends Controller
         return back()->with('success', 'Pelanggan berhasil dihapus.');
     }
 
+    /**
+     * @return array{id: int, name: string, email: string, role: string}
+     */
     private function adminPayload(Request $request): array
     {
         $admin = $request->user();
+
         return [
             'id' => $admin->id,
             'name' => $admin->name,

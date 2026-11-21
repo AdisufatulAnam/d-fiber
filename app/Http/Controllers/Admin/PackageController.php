@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Package;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -22,7 +23,7 @@ class PackageController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -36,7 +37,7 @@ class PackageController extends Controller
         return back()->with('success', 'Paket berhasil ditambahkan.');
     }
 
-    public function update(Request $request, Package $package)
+    public function update(Request $request, Package $package): RedirectResponse
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -50,7 +51,7 @@ class PackageController extends Controller
         return back()->with('success', 'Paket berhasil diperbarui.');
     }
 
-    public function destroy(Package $package)
+    public function destroy(Package $package): RedirectResponse
     {
         // Lepas relasi dari customers sebelum hapus
         $package->customers()->update(['package_id' => null]);
@@ -59,9 +60,13 @@ class PackageController extends Controller
         return back()->with('success', 'Paket berhasil dihapus.');
     }
 
+    /**
+     * @return array{id: int, name: string, email: string, role: string}
+     */
     private function adminPayload(Request $request): array
     {
         $admin = $request->user();
+
         return [
             'id' => $admin->id,
             'name' => $admin->name,

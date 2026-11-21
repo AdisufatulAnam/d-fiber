@@ -13,8 +13,6 @@ class UserController extends Controller
 
     /**
      * UserController constructor.
-     *
-     * @param UserService $userService
      */
     public function __construct(UserService $userService)
     {
@@ -23,13 +21,11 @@ class UserController extends Controller
 
     /**
      * Display a listing of the resource.
-     *
-     * @return Response
      */
     public function index(Request $request): Response
     {
         $search = $request->get('search');
-        
+
         $users = $this->userService->getUsersList($search);
 
         return Inertia::render('Users/Index', [

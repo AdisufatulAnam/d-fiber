@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Jobs\SendPaymentInvoice;
+use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -19,9 +20,11 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string|null $reference
  * @property string $status
  * @property string|null $notes
+ * @property string|null $invoice_number
  */
 class Payment extends Model
 {
+    /** @use HasFactory<Factory> */
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
@@ -75,17 +78,23 @@ class Payment extends Model
      */
     public static function generateInvoiceNumber(): string
     {
-        $prefix = 'PAY' . now()->format('ymd');
-        $count = static::where('invoice_number', 'like', $prefix . '%')->count();
+        $prefix = 'PAY'.now()->format('ymd');
+        $count = static::where('invoice_number', 'like', $prefix.'%')->count();
 
-        return $prefix . str_pad((string) ($count + 1), 5, '0', STR_PAD_LEFT);
+        return $prefix.str_pad((string) ($count + 1), 5, '0', STR_PAD_LEFT);
     }
 
+    /**
+     * @return BelongsTo<Customer, $this>
+     */
     public function customer(): BelongsTo
     {
         return $this->belongsTo(Customer::class);
     }
 
+    /**
+     * @return HasMany<PaymentWhatsappLog, $this>
+     */
     public function whatsappLogs(): HasMany
     {
         return $this->hasMany(PaymentWhatsappLog::class)->orderByDesc('created_at');
@@ -107,7 +116,7 @@ class Payment extends Model
             'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember',
         ];
 
-        return ($names[(int) $month] ?? '-') . ' ' . $year;
+        return ($names[(int) $month] ?? '-').' '.$year;
     }
 
     /**
@@ -115,6 +124,6 @@ class Payment extends Model
      */
     public function amountLabel(): string
     {
-        return 'Rp' . number_format((float) $this->amount, 0, ',', '.');
+        return 'Rp'.number_format((float) $this->amount, 0, ',', '.');
     }
 }
