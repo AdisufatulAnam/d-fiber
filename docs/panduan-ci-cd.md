@@ -67,9 +67,6 @@ Buat **5 secret** berikut:
 | `DEPLOY_PATH`    | Direktori deploy di server             | Langkah 3.4 (mis. `/home/ho/dfiber`) |
 | `DEPLOY_SSH_KEY` | Private key SSH (multiline)            | Langkah 3.3                          |
 
-
-
-
 ### 2.1 Membuat Auth Key Tailscale
 
 ```bash
@@ -97,7 +94,6 @@ Buat **5 secret** berikut:
 
 Semua perintah di bawah dijalankan **di server home** kecuali disebut lain.
 Keterangan tiap perintah ditulis setelah tanda `#`.
-
 
 ### 3.1 Prasyarat: Docker
 
