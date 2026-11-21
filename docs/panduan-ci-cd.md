@@ -98,6 +98,7 @@ Buat **5 secret** berikut:
 Semua perintah di bawah dijalankan **di server home** kecuali disebut lain.
 Keterangan tiap perintah ditulis setelah tanda `#`.
 
+
 ### 3.1 Prasyarat: Docker
 
 ```bash
