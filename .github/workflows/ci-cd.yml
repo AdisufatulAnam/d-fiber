@@ -170,42 +170,6 @@ jobs:
       tag: ${{ steps.meta.outputs.version }} # contoh: main
 
   # ===========================================================================
-  # NOTIFIKASI (SUCCESS / FAILURE)
-  # Mengirim webhook (misal Telegram/Discord) berdasarkan status keseluruhan workflow.
-  # ===========================================================================
-  notify:
-    name: "Notifikasi CI/CD"
-    needs: [test, build, deploy]
-    if: always() # Tetap jalan walau test, build, atau deploy ada yang gagal
-    runs-on: ubuntu-latest
-    steps:
-      - name: Kirim Notifikasi Sukses
-        if: ${{ needs.test.result == 'success' && needs.build.result == 'success' && (needs.deploy.result == 'success' || needs.deploy.result == 'skipped') && github.event_name == 'push' }}
-        env:
-          WEBHOOK_URL: ${{ secrets.CI_NOTIFICATION_WEBHOOK }}
-        run: |
-          if [ -n "${WEBHOOK_URL:-}" ]; then
-            curl -s -X POST "$WEBHOOK_URL" \
-              -H "Content-Type: application/json" \
-              -d "{\"content\": \"✅ *CI/CD Sukses!*\nRepository: \`${{ github.repository }}\`\nBranch: \`${{ github.ref_name }}\`\nCommit: \`${{ github.sha }}\`\nAuthor: \`${{ github.actor }}\`\"}"
-          else
-            echo "WEBHOOK_URL belum diset di GitHub Secrets."
-          fi
-
-      - name: Kirim Notifikasi Gagal
-        if: ${{ needs.test.result == 'failure' || needs.build.result == 'failure' || needs.deploy.result == 'failure' }}
-        env:
-          WEBHOOK_URL: ${{ secrets.CI_NOTIFICATION_WEBHOOK }}
-        run: |
-          if [ -n "${WEBHOOK_URL:-}" ]; then
-            curl -s -X POST "$WEBHOOK_URL" \
-              -H "Content-Type: application/json" \
-              -d "{\"content\": \"❌ *CI/CD Gagal!*\nRepository: \`${{ github.repository }}\`\nBranch: \`${{ github.ref_name }}\`\nCommit: \`${{ github.sha }}\`\nAuthor: \`${{ github.actor }}\`\n[Lihat Detail Aksi]($ {GITHUB_SERVER_URL}/${{ github.repository }}/actions/runs/${{ github.run_id }})\"}"
-          else
-            echo "WEBHOOK_URL belum diset di GitHub Secrets."
-          fi
-
-  # ===========================================================================
   # JOB 3/3 - DEPLOY KE SERVER HOME
   # SSH ke server home lewat Tailscale (server tidak butuh IP publik).
   # ===========================================================================
@@ -330,3 +294,66 @@ jobs:
             # punya tag setelah diganti) agar disk server tidak membengkak.
             # Image ber-tag sha-xxx TIDAK dihapus (dipakai untuk rollback).
             docker image prune -f
+
+  notify:
+    name: "Notifikasi Discord"
+    needs: [test, build, deploy]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Kirim Notifikasi Discord
+        env:
+          WEBHOOK_URL: ${{ secrets.WEBHOOK_URL }}
+          TEST_RESULT: ${{ needs.test.result }}
+          BUILD_RESULT: ${{ needs.build.result }}
+          DEPLOY_RESULT: ${{ needs.deploy.result }}
+        run: |
+          if [ -z "$WEBHOOK_URL" ]; then
+            echo "WEBHOOK_URL tidak diset, lewati notifikasi."
+            exit 0
+          fi
+
+          if [ "$TEST_RESULT" = "success" ] && [ "$BUILD_RESULT" = "success" ] && [ "$DEPLOY_RESULT" = "success" ]; then
+            EMOJI="🚀"
+            STATUS="SUCCESS"
+            COLOR=3066993
+            FOOTER="🎉 Application successfully deployed!"
+          else
+            EMOJI="💥"
+            STATUS="FAILED"
+            COLOR=15158332
+            FOOTER="❌ Deployment failed. Check GitHub Actions logs!"
+          fi
+
+          FMT_RESULT() {
+            if [ "$1" = "success" ]; then echo "SUCCESS"; elif [ "$1" = "skipped" ]; then echo "SKIPPED"; else echo "FAILED"; fi
+          }
+
+          DESC=$(cat <<EOF
+    📦 Project : dfiber-app
+    🌿 Branch  : ${{ github.ref_name }}
+    👤 Author  : ${{ github.actor }}
+    🔖 Commit  : ${{ github.sha }}
+
+    📋 PIPELINE RESULTS
+    ━━━━━━━━━━━━━━━━━━━━
+    Test Check    : $(FMT_RESULT "$TEST_RESULT")
+    Docker Build  : $(FMT_RESULT "$BUILD_RESULT")
+    SSH Deploy    : $(FMT_RESULT "$DEPLOY_RESULT")
+    ━━━━━━━━━━━━━━━━━━━━
+
+    $FOOTER
+
+    🔗 GitHub Actions:
+    https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+    EOF
+          )
+
+          PAYLOAD=$(jq -n \
+            --arg title "$EMOJI CI/CD DEPLOYMENT $STATUS" \
+            --arg desc "$DESC" \
+            --argjson color "$COLOR" \
+            '{embeds: [{title: $title, description: $desc, color: $color}]}')
+
+          curl -s -H "Content-Type: application/json" -X POST -d "$PAYLOAD" "$WEBHOOK_URL"
+
