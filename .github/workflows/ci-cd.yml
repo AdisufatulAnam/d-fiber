@@ -325,35 +325,29 @@ jobs:
             FOOTER="❌ Deployment failed. Check GitHub Actions logs!"
           fi
 
-          FMT_RESULT() {
-            if [ "$1" = "success" ]; then echo "SUCCESS"; elif [ "$1" = "skipped" ]; then echo "SKIPPED"; else echo "FAILED"; fi
-          }
-
-          DESC=$(cat <<EOF
-    📦 Project : dfiber-app
-    🌿 Branch  : ${{ github.ref_name }}
-    👤 Author  : ${{ github.actor }}
-    🔖 Commit  : ${{ github.sha }}
-
-    📋 PIPELINE RESULTS
-    ━━━━━━━━━━━━━━━━━━━━
-    Test Check    : $(FMT_RESULT "$TEST_RESULT")
-    Docker Build  : $(FMT_RESULT "$BUILD_RESULT")
-    SSH Deploy    : $(FMT_RESULT "$DEPLOY_RESULT")
-    ━━━━━━━━━━━━━━━━━━━━
-
-    $FOOTER
-
-    🔗 GitHub Actions:
-    https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-    EOF
-          )
+          FMT_TEST=$( [ "$TEST_RESULT" = "success" ] && echo "SUCCESS" || echo "FAILED" )
+          FMT_BUILD=$( [ "$BUILD_RESULT" = "success" ] && echo "SUCCESS" || ( [ "$BUILD_RESULT" = "skipped" ] && echo "SKIPPED" || echo "FAILED" ) )
+          FMT_DEPLOY=$( [ "$DEPLOY_RESULT" = "success" ] && echo "SUCCESS" || ( [ "$DEPLOY_RESULT" = "skipped" ] && echo "SKIPPED" || echo "FAILED" ) )
 
           PAYLOAD=$(jq -n \
-            --arg title "$EMOJI CI/CD DEPLOYMENT $STATUS" \
-            --arg desc "$DESC" \
+            --arg title "${EMOJI} CI/CD DEPLOYMENT ${STATUS}" \
+            --arg repo "${{ github.repository }}" \
+            --arg run_id "${{ github.run_id }}" \
+            --arg branch "${{ github.ref_name }}" \
+            --arg author "${{ github.actor }}" \
+            --arg commit "${{ github.sha }}" \
+            --arg test "$FMT_TEST" \
+            --arg build "$FMT_BUILD" \
+            --arg deploy "$FMT_DEPLOY" \
+            --arg footer "$FOOTER" \
             --argjson color "$COLOR" \
-            '{embeds: [{title: $title, description: $desc, color: $color}]}')
+            '{
+              embeds: [{
+                title: $title,
+                description: ("📦 Project : dfiber-app\n🌿 Branch  : " + $branch + "\n👤 Author  : " + $author + "\n🔖 Commit  : " + $commit + "\n\n📋 PIPELINE RESULTS\n━━━━━━━━━━━━━━━━━━━━\nTest Check    : " + $test + "\nDocker Build  : " + $build + "\nSSH Deploy    : " + $deploy + "\n━━━━━━━━━━━━━━━━━━━━\n\n" + $footer + "\n\n🔗 GitHub Actions:\nhttps://github.com/" + $repo + "/actions/runs/" + $run_id),
+                color: $color
+              }]
+            }')
 
           curl -s -H "Content-Type: application/json" -X POST -d "$PAYLOAD" "${WEBHOOK_URL}"
 
