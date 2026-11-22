@@ -344,7 +344,7 @@ jobs:
             '{
               embeds: [{
                 title: $title,
-                description: ("📦 Project : dfiber-app\n🌿 Branch  : " + $branch + "\n👤 Author  : " + $author + "\n🔖 Commit  : " + $commit + "\n\n📋 PIPELINE RESULTS\n━━━━━━━━━━━━━━━━━━━━\nTest Check    : " + $test + "\nDocker Build  : " + $build + "\nSSH Deploy    : " + $deploy + "\n━━━━━━━━━━━━━━━━━━━━\n\n" + $footer + "\n\n🔗 GitHub Actions:\nhttps://github.com/" + $repo + "/actions/runs/" + $run_id),
+                description: ("```\n📦 Project : dfiber-app\n🌿 Branch  : " + $branch + "\n👤 Author  : " + $author + "\n🔖 Commit  : " + $commit + "\n\n📋 PIPELINE RESULTS\n━━━━━━━━━━━━━━━━━━━━\nTest Check    : " + $test + "\nDocker Build  : " + $build + "\nSSH Deploy    : " + $deploy + "\n━━━━━━━━━━━━━━━━━━━━\n\n" + $footer + "\n```\n🔗 GitHub Actions:\nhttps://github.com/" + $repo + "/actions/runs/" + $run_id),
                 color: $color
               }]
             }')
