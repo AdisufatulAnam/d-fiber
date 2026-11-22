@@ -1,42 +1,15 @@
-# =============================================================================
-# docker-compose PRODUKSI - dipakai di server home oleh CI/CD (GitHub Actions)
-# =============================================================================
-# Perbedaan dengan docker-compose.yml (development):
-#   - image diambil dari GHCR (hasil build di GitHub Actions), BUKAN build lokal
-#   - source code TIDAK di-mount (kode sudah "baked" di dalam image)
-#   - storage/ memakai named volume agar data (log, file) tetap awet saat
-#     container diganti saat deploy
-#
-# Variabel berikut dibaca dari file .env di direktori yang sama:
-#   DOCKER_IMAGE, DOCKER_IMAGE_TAG, DOCKER_HTTP_PORT, DOCKER_*_CONTAINER,
-#   DB_CONNECTION, DB_HOST, DB_PORT, DB_DATABASE, DB_USERNAME, DB_PASSWORD, dll.
-#
-# Saat deploy, GitHub Actions menimpa DOCKER_IMAGE & DOCKER_IMAGE_TAG lewat env
-# sehingga server selalu menarik image dari commit yang benar.
-# Panduan: docs/panduan-ci-cd.md
-# =============================================================================
-
 services:
     app:
-        # Image hasil build CI. Default "latest" dipakai hanya untuk jalankan manual;
-        # saat deploy, env DOCKER_IMAGE + DOCKER_IMAGE_TAG dari GitHub Actions menimpa.
         image: ${DOCKER_IMAGE:-ghcr.io/adisufatulanam/d-fiber}:${DOCKER_IMAGE_TAG:-latest}
         container_name: ${DOCKER_APP_CONTAINER:-dfiber-app}
-        restart: unless-stopped # auto-start lagi kalau server reboot atau container crash
+        restart: unless-stopped 
         ports:
-            # Port HTTP: 80 di dalam container -> 8000 (atau DOCKER_HTTP_PORT) di host
             - '${DOCKER_HTTP_PORT:-8000}:80'
         env_file:
-            # Konfigurasi aplikasi (APP_KEY, DB, WA, MAIL, dll) - file ini HANYA ada
-            # di server, tidak pernah di-commit ke git
             - .env
         volumes:
-            # Named volume untuk data yang harus bertahan meski container diganti.
-            # Isinya otomatis disalin dari image saat pertama kali container dibuat.
             - app-storage:/var/www/html/storage
         environment:
-            # Koneksi database (dari .env). Default host.docker.internal = MySQL
-            # yang berjalan di host server (bukan di container).
             - DB_CONNECTION=${DB_CONNECTION:-mysql}
             - DB_HOST=${DB_HOST:-host.docker.internal}
             - DB_PORT=${DB_PORT:-3306}
@@ -45,18 +18,14 @@ services:
             - DB_PASSWORD=${DB_PASSWORD:-}
             - PAIL_DISABLED=true
         extra_hosts:
-            # "host.docker.internal" diarahkan ke IP gateway Docker -> jembatan
-            # menuju host server tempat MySQL berjalan
             - 'host.docker.internal:host-gateway'
         networks:
             - dfiber-network
 
     queue:
-        # Image yang sama dengan app (satu build, dua service)
         image: ${DOCKER_IMAGE:-ghcr.io/adisufatulanam/d-fiber}:${DOCKER_IMAGE_TAG:-latest}
         container_name: ${DOCKER_QUEUE_CONTAINER:-dfiber-queue}
         restart: unless-stopped
-        # Worker antrian: memproses job database queue (kirim WA, generate PDF, dll)
         command: php artisan queue:work --sleep=3 --tries=5 --timeout=120
         env_file:
             - .env
@@ -76,13 +45,9 @@ services:
             - dfiber-network
 
 volumes:
-    # Named volume milik Docker; bertahan selama tidak dihapus manual
-    # (docker volume rm dfiber-app_app-storage). Menjamin log & file storage
-    # tidak hilang saat deploy mengganti container.
     app-storage:
 
 networks:
     dfiber-network:
-        # Satu jaringan khusus aplikasi ini (app <-> queue saling terjangkau)
         name: ${DOCKER_NETWORK_NAME:-dfiber-network}
         driver: bridge

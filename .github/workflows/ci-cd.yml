@@ -1,53 +1,30 @@
-# =============================================================================
-# CI/CD: Test -> Build Image (GHCR) -> Deploy ke Server Home (Tailscale SSH)
-# =============================================================================
-# Alur pipeline (3 job, berurutan):
-#   1. test   : lint (Pint), type-check (PHPStan + vue-tsc), unit test (Pest)
-#   2. build  : build Docker image lalu push ke GitHub Container Registry
-#   3. deploy : SSH ke server home lewat Tailscale -> pull image -> migrate -> optimize
-#
-# Deploy HANYA berjalan saat push ke branch main.
-# Panduan lengkap setup GitHub & server home: docs/panduan-ci-cd.md
-# =============================================================================
-
 name: CI/CD
 
 on:
   push:
     branches:
-      - main # branch produksi -> test + build + deploy
-      - dev # branch pengembangan -> test + build saja (tanpa deploy)
-  pull_request: # setiap PR -> test + build saja (image tidak di-push)
+      - main
+      - dev 
+  pull_request: 
 
-# Jalankan satu per branch/PR. Run lama yang masih berjalan dibatalkan HANYA untuk
-# PR (supaya PR cepat). Push ke main tidak pernah dibatalkan agar deploy yang sedang
-# berjalan tidak terputus di tengah jalan.
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
-  # ===========================================================================
-  # JOB 1/3 - TEST
-  # Pastikan kode sehat (lint, tipe, test lulus) sebelum di-build/di-deploy.
-  # ===========================================================================
   test:
     name: "Job 1/3: Test"
-    runs-on: ubuntu-latest # runner resmi GitHub (Linux, gratis 2000 menit/bulan)
-    timeout-minutes: 20 # batas waktu job, mencegut run menggantung selamanya
+    runs-on: ubuntu-latest 
+    timeout-minutes: 20 
     permissions:
-      contents: read # job ini hanya boleh membaca kode
+      contents: read 
 
-    # Database MySQL untuk `composer setup` (langkah migrate).
-    # Kredensial harus sama dengan .env.example (root/example, db dfiber)
-    # karena setup menyalin .env.example -> .env di runner.
-    # health-cmd membuat runner menunggu MySQL siap sebelum step pertama jalan.
     services:
       mysql:
         image: mysql:8.0
         env:
           MYSQL_ROOT_PASSWORD: example
-          MYSQL_ROOT_HOST: "%" # izinkan koneksi dari runner (bukan hanya localhost container)
+          MYSQL_ROOT_HOST: "%" 
           MYSQL_DATABASE: dfiber
         ports:
           - 3306:3306
@@ -58,125 +35,80 @@ jobs:
           --health-retries=5
 
     steps:
-      # Ambil kode repository ke runner.
-      # persist-credentials: false -> token GitHub tidak disimpan di disk runner
-      # (langkah keamanan standar, mencegah token bocor lewat script build).
       - name: Checkout code
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           persist-credentials: false
 
-      # Pasang PHP 8.5 + Composer v2 di runner.
-      # Harus sama dengan versi di Dockerfile (8.5.x) karena composer.lock
-      # dikunci untuk paket yang butuh PHP >= 8.4.1 (symfony 8.1, pest 5, dll).
-      # coverage: none -> tidak memasang xdebug, job jauh lebih cepat.
       - name: Setup PHP
-        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 
         with:
           php-version: '8.5'
-          extensions: pdo_mysql # driver MySQL untuk langkah migrate di composer setup
+          extensions: pdo_mysql 
           tools: composer:v2
           coverage: none
 
-      # Pasang Node.js 22 untuk tool frontend (Vite, vue-tsc, npm run check).
       - name: Setup Node
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 
         with:
           node-version: '22'
 
-      # composer setup (lihat composer.json) menjalankan:
-      #   composer install          -> pasang dependency PHP
-      #   copy .env.example -> .env  -> buat file env di runner (sekali pakai)
-      #   php artisan key:generate  -> buat APP_KEY untuk runner
-      #   php artisan migrate       -> terapkan migrasi database ke DB sementara CI
-      #   npm install + npm run build -> pasang dependency JS & build aset Vite
       - name: Setup Application
         run: composer setup
 
-      # composer ci:check (lihat composer.json) menjalankan:
-      #   npm run check        -> lint/format kode frontend (vite-plus)
-      #   npm run types:check  -> type-check TypeScript (vue-tsc --noEmit)
-      #   pint --parallel --test -> cek format kode PHP (tanpa mengubah file)
-      #   phpstan analyse      -> static analysis PHP (larastan)
-      #   php artisan test     -> unit test Pest
       - name: Run CI Checks
         run: composer ci:check
 
-  # ===========================================================================
-  # JOB 2/3 - BUILD & PUSH IMAGE
-  # Build image Docker produksi lalu simpan ke GHCR. Hanya jalan jika test lulus.
-  # ===========================================================================
   build:
     name: "Job 2/3: Build image"
-    needs: test # rantai: test harus lulus dulu sebelum build
+    needs: test 
     runs-on: ubuntu-latest
-    timeout-minutes: 30 # build Docker pertama kali bisa lama (~10 menit)
+    timeout-minutes: 30 
 
-    # Hak akses khusus job ini:
-    # - contents: read  -> boleh baca kode
-    # - packages: write -> BOLEH menulis (push) image ke GHCR
     permissions:
       contents: read
       packages: write
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 
         with:
           persist-credentials: false
 
-      # Login ke GitHub Container Registry (ghcr.io) memakai token otomatis
-      # GITHUB_TOKEN yang lahir per-run - tidak perlu membuat token manual.
       - name: Login ke GHCR
-        uses: docker/login-action@8aa5831fb8d48d8f76594c7ddde61ae58019f550 # v4.8.0
+        uses: docker/login-action@8aa5831fb8d48d8f76594c7ddde61ae58019f550 
         with:
-          registry: ghcr.io # registry Docker milik GitHub
-          username: ${{ github.actor }} # pemilik repository (AdisufatulAnam)
-          password: ${{ secrets.GITHUB_TOKEN }} # token otomatis, hangus setelah run selesai
+          registry: ghcr.io 
+          username: ${{ github.actor }} 
+          password: ${{ secrets.GITHUB_TOKEN }} 
 
-      # Hitung nama & tag image otomatis dari konteks GitHub:
-      #   type=ref,event=branch -> tag "main" / "dev" (sesuai nama branch)
-      #   type=sha             -> tag "sha-<commit>" (dipakai untuk rollback)
-      #   type=raw latest      -> tag "latest", HANYA di default branch (main)
-      # Contoh hasil: ghcr.io/adisufatulanam/d-fiber:main
       - name: Hitung metadata image
-        id: meta # id ini dipakai di bawah (steps.meta.outputs.*) dan di job deploy
-        uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6.2.0
+        id: meta 
+        uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 
         with:
-          images: ghcr.io/${{ github.repository }} # nama image = ghcr.io/<owner>/<repo>
+          images: ghcr.io/${{ github.repository }} 
           tags: |
             type=ref,event=branch
             type=sha,prefix=sha-
             type=raw,value=latest,enable={{is_default_branch}}
 
-      # Build image dari Dockerfile (composer install --no-dev, npm ci, npm run build).
-      # - push: true hanya untuk event push; di PR cukup build untuk membuktikan
-      #   Dockerfile tidak rusak (image tidak diunggah).
-      # - cache gha memakai cache bawaan GitHub Actions agar build berikutnya cepat
-      #   (layer composer/npm tidak diulang dari nol).
       - name: Build dan push image
-        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc
         with:
-          context: . # konteks build = root repository (tempat Dockerfile)
+          context: . 
           push: ${{ github.event_name == 'push' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha # baca cache dari GitHub Actions
-          cache-to: type=gha,mode=max # tulis semua layer ke cache (bukan hanya final)
+          cache-from: type=gha 
+          cache-to: type=gha,mode=max 
 
-    # Output job ini dipakai job deploy untuk tahu image mana yang harus di-pull.
     outputs:
-      image: ${{ steps.meta.outputs.image }} # contoh: ghcr.io/adisufatulanam/d-fiber
-      tag: ${{ steps.meta.outputs.version }} # contoh: main
+      image: ${{ steps.meta.outputs.image }} 
+      tag: ${{ steps.meta.outputs.version }} 
 
-  # ===========================================================================
-  # JOB 3/3 - DEPLOY KE SERVER HOME
-  # SSH ke server home lewat Tailscale (server tidak butuh IP publik).
-  # ===========================================================================
   deploy:
     name: "Job 3/3: Deploy"
-    needs: build # rantai: test -> build -> deploy (test wajib lulus dulu)
-    # Hanya deploy saat push ke main. PR dan push ke dev TIDAK deploy.
+    needs: build 
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -184,33 +116,23 @@ jobs:
       contents: read
 
     steps:
-      # Checkout diperlukan agar file docker-compose.prod.yml tersedia
-      # untuk di-upload (scp) ke server di langkah berikutnya.
       - name: Checkout code
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 
         with:
           persist-credentials: false
 
-      # Aktifkan Tailscale di runner: runner "masuk" ke VPN rumah sehingga bisa
-      # menjangkau server home yang berada di belakang NAT (tanpa IP publik).
-      # - authkey : kunci otomatisasi dari admin Tailscale (secret TS_AUTHKEY)
-      # - ping    : verifikasi dulu bahwa server home benar-benar online di tailnet;
-      #             kalau mati, job gagal di sini dengan pesan jelas (bukan timeout SSH)
       - name: Hubungkan runner ke Tailscale
-        uses: tailscale/github-action@064b10558093f38325e838ddea35486bdc6b1d5c # v4.4.0
+        uses: tailscale/github-action@064b10558093f38325e838ddea35486bdc6b1d5c
         with:
           authkey: ${{ secrets.TS_AUTHKEY }}
           ping: ${{ secrets.DEPLOY_HOST }}
 
-      # Simpan private key deploy ke runner lalu salin docker-compose.prod.yml
-      # ke server via SCP. Dengan ini server TIDAK perlu menyimpan kredensial git
-      # sama sekali - file compose selalu tersinkron dari repository.
       - name: Upload docker-compose.prod.yml ke server
         env:
-          SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }} # isi private key (multiline)
-          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }} # IP Tailscale server, mis. 100.64.0.1
+          SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }} # isi private key 
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }} # IP Tailscale server
           DEPLOY_USER: ${{ secrets.DEPLOY_USER }} # username SSH di server
-          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }} # direktori deploy, mis. /home/ho/dfiber
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }} # direktori deploy, mis. /home/dfiber
         run: |
           # 1. Simpan private key ke file tersembunyi dengan permission ketat
           #    (600 = hanya pemilik yang boleh membaca; OpenSSH menolak key lebih longgar)
@@ -226,20 +148,18 @@ jobs:
             docker-compose.prod.yml \
             "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PATH/docker-compose.prod.yml"
 
-      # Jalankan script deploy di server home lewat SSH (jalur Tailscale).
-      # envs = daftar nama variabel di atas yang diteruskan ke script remote.
       - name: Jalankan deploy di server
-        uses: appleboy/ssh-action@0ff4204d59e8e51228ff73bce53f80d53301dee2 # v1.2.5
+        uses: appleboy/ssh-action@0ff4204d59e8e51228ff73bce53f80d53301dee2 
         env:
-          DOCKER_IMAGE: ${{ needs.build.outputs.image }} # contoh: ghcr.io/adisufatulanam/d-fiber
-          DOCKER_IMAGE_TAG: ${{ needs.build.outputs.tag }} # contoh: main
+          DOCKER_IMAGE: ${{ needs.build.outputs.image }} 
+          DOCKER_IMAGE_TAG: ${{ needs.build.outputs.tag }} 
           DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
         with:
-          host: ${{ secrets.DEPLOY_HOST }} # IP Tailscale server home
+          host: ${{ secrets.DEPLOY_HOST }} 
           username: ${{ secrets.DEPLOY_USER }}
           key: ${{ secrets.DEPLOY_SSH_KEY }}
-          timeout: 30s # batas waktu koneksi SSH
-          command_timeout: 10m # batas waktu eksekusi script di server
+          timeout: 2m 
+          command_timeout: 20m 
           envs: DOCKER_IMAGE,DOCKER_IMAGE_TAG,DEPLOY_PATH
           script: |
             # set -e  : langsung berhenti kalau ada perintah yang gagal
