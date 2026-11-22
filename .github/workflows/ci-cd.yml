@@ -308,7 +308,7 @@ jobs:
           BUILD_RESULT: ${{ needs.build.result }}
           DEPLOY_RESULT: ${{ needs.deploy.result }}
         run: |
-          if [ -z "$WEBHOOK_URL" ]; then
+          if [ -z "${WEBHOOK_URL}" ]; then
             echo "WEBHOOK_URL tidak diset, lewati notifikasi."
             exit 0
           fi
@@ -355,5 +355,5 @@ jobs:
             --argjson color "$COLOR" \
             '{embeds: [{title: $title, description: $desc, color: $color}]}')
 
-          curl -s -H "Content-Type: application/json" -X POST -d "$PAYLOAD" "$WEBHOOK_URL"
+          curl -s -H "Content-Type: application/json" -X POST -d "$PAYLOAD" "${WEBHOOK_URL}"
 
