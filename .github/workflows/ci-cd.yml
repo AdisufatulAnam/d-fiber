@@ -134,16 +134,11 @@ jobs:
           DEPLOY_USER: ${{ secrets.DEPLOY_USER }} # username SSH di server
           DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }} # direktori deploy, mis. /home/dfiber
         run: |
-          # 1. Simpan private key ke file tersembunyi dengan permission ketat
-          #    (600 = hanya pemilik yang boleh membaca; OpenSSH menolak key lebih longgar)
           mkdir -p "$HOME/.ssh"
           printf '%s\n' "$SSH_KEY" > "$HOME/.ssh/id_ed25519"
           chmod 700 "$HOME/.ssh"
           chmod 600 "$HOME/.ssh/id_ed25519"
 
-          # 2. Salin file compose produksi ke server.
-          #    StrictHostKeyChecking=accept-new -> terima host key pertama kali
-          #    tanpa error interaktif (aman karena kita sudah lewat Tailscale).
           scp -i "$HOME/.ssh/id_ed25519" -o StrictHostKeyChecking=accept-new \
             docker-compose.prod.yml \
             "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PATH/docker-compose.prod.yml"
@@ -162,36 +157,28 @@ jobs:
           command_timeout: 20m 
           envs: DOCKER_IMAGE,DOCKER_IMAGE_TAG,DEPLOY_PATH
           script: |
-            # set -e  : langsung berhenti kalau ada perintah yang gagal
-            # set -u  : error kalau ada variabel kosong/tidak didefinisikan
-            # pipefail: error kalau bagian kiri pipe yang gagal
             set -euo pipefail
 
-            # Masuk ke direktori deploy (berisi docker-compose.prod.yml + .env)
             cd "$DEPLOY_PATH"
 
             echo "==> [1/6] Tarik image ${DOCKER_IMAGE}:${DOCKER_IMAGE_TAG} dari GHCR"
-            # docker compose pull menarik image sesuai variabel DOCKER_IMAGE/TAG
-            # (dibaca dari env di atas, menimpa nilai di .env server)
+
             docker compose -f docker-compose.prod.yml pull
 
             echo "==> [2/6] Jalankan ulang container dengan image baru"
-            # up -d membuat ulang container yang image-nya berubah (tanpa downtime
-            # panjang); --remove-orphans membuang container sisa compose lama
+
             docker compose -f docker-compose.prod.yml up -d --remove-orphans
 
             echo "==> [3/6] Jalankan migrasi database"
-            # exec -T = masuk ke container app tanpa TTY (wajib di CI),
-            # --force = wajibkan migrasi walau APP_ENV=production
+
             docker compose -f docker-compose.prod.yml exec -T app php artisan migrate --force
 
             echo "==> [4/6] Cache konfigurasi & route"
-            # optimize = config:cache + route:cache -> response aplikasi lebih cepat
+
             docker compose -f docker-compose.prod.yml exec -T app php artisan optimize
 
             echo "==> [5/6] Smoke test: buka halaman utama dari dalam container"
-            # Coba akses http://localhost/ (route "/") maksimal 10x dengan jeda 2 detik
-            # (nginx/php-fpm mungkin butuh waktu beberapa detik setelah container baru)
+
             smoke_ok=""
             for i in $(seq 1 10); do
               if docker compose -f docker-compose.prod.yml exec -T app curl -fsS -o /dev/null http://localhost/; then
@@ -208,11 +195,9 @@ jobs:
             echo "      OK - aplikasi merespons 200"
 
             echo "==> [6/6] Status container + bersihkan image lama"
-            # ps = tampilkan status container (running/exit) untuk log GitHub
+
             docker compose -f docker-compose.prod.yml ps
-            # image prune -f = buang image dangling (image lama yang sudah tidak
-            # punya tag setelah diganti) agar disk server tidak membengkak.
-            # Image ber-tag sha-xxx TIDAK dihapus (dipakai untuk rollback).
+
             docker image prune -f
 
   notify:

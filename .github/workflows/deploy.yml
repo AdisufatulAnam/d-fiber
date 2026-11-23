@@ -10,7 +10,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # Contoh step pipeline (ubah sesuai kebutuhan project kamu)
       - name: Automated Testing
         id: test
         run: echo "Running tests..."
